@@ -1,0 +1,221 @@
+const payrollModel = require('../models/payroll.model');
+const { validationResult } = require('express-validator');
+
+const payrollController = {
+  /**
+   * Get all payroll runs
+   */
+  async getAllRuns(req, res) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const result = await payrollModel.getAllRuns(page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get payroll runs error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching payroll runs'
+      });
+    }
+  },
+
+  /**
+   * Get payroll run by ID
+   */
+  async getRunById(req, res) {
+    try {
+      const { id } = req.params;
+      const payrollRun = await payrollModel.getRunById(id);
+
+      if (!payrollRun) {
+        return res.status(404).json({
+          success: false,
+          message: 'Payroll run not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: payrollRun
+      });
+    } catch (error) {
+      console.error('Get payroll run error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching payroll run'
+      });
+    }
+  },
+
+  /**
+   * Create payroll run
+   */
+  async createRun(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation errors',
+          errors: errors.array()
+        });
+      }
+
+      const runData = {
+        ...req.body,
+        processed_by: req.user.id
+      };
+
+      const payrollRun = await payrollModel.createRun(runData);
+
+      res.status(201).json({
+        success: true,
+        message: 'Payroll run created successfully',
+        data: payrollRun
+      });
+    } catch (error) {
+      console.error('Create payroll run error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error creating payroll run'
+      });
+    }
+  },
+
+  /**
+   * Process payroll
+   */
+  async processPayroll(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation errors',
+          errors: errors.array()
+        });
+      }
+
+      const { runId } = req.params;
+      const { employeePayslips } = req.body;
+
+      const payslips = await payrollModel.processPayroll(runId, employeePayslips, req.user.id);
+
+      res.json({
+        success: true,
+        message: 'Payroll processed successfully',
+        data: payslips
+      });
+    } catch (error) {
+      console.error('Process payroll error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error processing payroll'
+      });
+    }
+  },
+
+  /**
+   * Get payslip by ID
+   */
+  async getPayslipById(req, res) {
+    try {
+      const { id } = req.params;
+      const payslip = await payrollModel.getPayslipById(id);
+
+      if (!payslip) {
+        return res.status(404).json({
+          success: false,
+          message: 'Payslip not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: payslip
+      });
+    } catch (error) {
+      console.error('Get payslip error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching payslip'
+      });
+    }
+  },
+
+  /**
+   * Get employee payslips
+   */
+  async getEmployeePayslips(req, res) {
+    try {
+      const { employeeId } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 12;
+
+      const result = await payrollModel.getEmployeePayslips(employeeId, page, limit);
+
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get employee payslips error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching employee payslips'
+      });
+    }
+  },
+
+  /**
+   * Update payslip payment status
+   */
+  async updatePaymentStatus(req, res) {
+    try {
+      const { payslipId } = req.params;
+      const { status, payment_date } = req.body;
+
+      const payslip = await payrollModel.updatePaymentStatus(payslipId, status, payment_date);
+
+      res.json({
+        success: true,
+        message: 'Payment status updated successfully',
+        data: payslip
+      });
+    } catch (error) {
+      console.error('Update payment status error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error updating payment status'
+      });
+    }
+  },
+
+  /**
+   * Get payroll statistics
+   */
+  async getStats(req, res) {
+    try {
+      const stats = await payrollModel.getStats();
+      
+      res.json({
+        success: true,
+        data: stats
+      });
+    } catch (error) {
+      console.error('Get payroll stats error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching payroll statistics'
+      });
+    }
+  }
+};
+
+module.exports = payrollController;

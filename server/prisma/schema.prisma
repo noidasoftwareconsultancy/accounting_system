@@ -1,0 +1,792 @@
+// Financial Management System - Comprehensive Prisma Schema
+// Aligned with the complete SQL database schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================================
+// CORE ENTITIES
+// ============================================================================
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique @db.VarChar(50)
+  email      String   @unique @db.VarChar(100)
+  password   String   @db.VarChar(255)
+  first_name String?  @db.VarChar(50)
+  last_name  String?  @db.VarChar(50)
+  role       String   @default("user") @db.VarChar(20)
+  department String?  @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  // Relations
+  clients_created        Client[]
+  projects_created       Project[]
+  contracts_created      Contract[]
+  milestones_created     Milestone[]
+  invoices_created       Invoice[]
+  payments_created       Payment[]
+  credit_notes_created   CreditNote[]
+  vendors_created        Vendor[]
+  expense_categories_created ExpenseCategory[]
+  expenses_created       Expense[]
+  recurring_expenses_created RecurringExpense[]
+  employees_created      Employee[] @relation("EmployeeCreator")
+  salary_structures_created SalaryStructure[]
+  attendance_created     Attendance[]
+  payroll_runs_processed PayrollRun[]
+  accounts_created       Account[]
+  journal_entries_created JournalEntry[]
+  tax_rates_created      TaxRate[]
+  bank_accounts_created  BankAccount[]
+  bank_transactions_created BankTransaction[]
+  payment_gateways_created PaymentGateway[]
+  report_templates_created ReportTemplate[]
+  saved_reports_created  SavedReport[]
+  dashboards_created     Dashboard[]
+  dashboard_widgets_created DashboardWidget[]
+  automation_rules_created AutomationRule[]
+  scheduled_tasks_created ScheduledTask[]
+  notifications          Notification[]
+  audit_logs             AuditLog[]
+  employee_user          Employee? @relation("UserEmployee")
+
+  @@map("users")
+}
+
+model Client {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(100)
+  email         String?  @db.VarChar(100)
+  phone         String?  @db.VarChar(20)
+  address       String?
+  tax_id        String?  @db.VarChar(50)
+  currency      String   @default("USD") @db.VarChar(3)
+  payment_terms Int      @default(30)
+  created_by    Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator   User        @relation(fields: [created_by], references: [id])
+  projects  Project[]
+  contracts Contract[]
+  invoices  Invoice[]
+
+  @@map("clients")
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  client_id   Int
+  description String?
+  start_date  DateTime? @db.Date
+  end_date    DateTime? @db.Date
+  status      String    @default("active") @db.VarChar(20)
+  budget      Decimal?  @db.Decimal(15, 2)
+  department  String?   @db.VarChar(50)
+  created_by  Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now()) @updatedAt
+
+  // Relations
+  client     Client      @relation(fields: [client_id], references: [id])
+  creator    User        @relation(fields: [created_by], references: [id])
+  contracts  Contract[]
+  milestones Milestone[]
+  invoices   Invoice[]
+  expenses   Expense[]
+
+  @@map("projects")
+}
+
+// ============================================================================
+// MODULE 1: REVENUE & BILLING MANAGEMENT
+// ============================================================================
+
+model Contract {
+  id            Int       @id @default(autoincrement())
+  client_id     Int
+  project_id    Int?
+  title         String    @db.VarChar(100)
+  description   String?
+  start_date    DateTime  @db.Date
+  end_date      DateTime? @db.Date
+  value         Decimal?  @db.Decimal(15, 2)
+  currency      String    @default("USD") @db.VarChar(3)
+  status        String    @default("active") @db.VarChar(20)
+  document_path String?   @db.VarChar(255)
+  created_by    Int
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @default(now()) @updatedAt
+
+  // Relations
+  client  Client   @relation(fields: [client_id], references: [id])
+  project Project? @relation(fields: [project_id], references: [id])
+  creator User     @relation(fields: [created_by], references: [id])
+
+  @@map("contracts")
+}
+
+model Milestone {
+  id                Int       @id @default(autoincrement())
+  project_id        Int
+  title             String    @db.VarChar(100)
+  description       String?
+  due_date          DateTime? @db.Date
+  amount            Decimal?  @db.Decimal(15, 2)
+  status            String    @default("pending") @db.VarChar(20)
+  invoice_generated Boolean   @default(false)
+  created_by        Int
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @default(now()) @updatedAt
+
+  // Relations
+  project Project @relation(fields: [project_id], references: [id])
+  creator User    @relation(fields: [created_by], references: [id])
+
+  @@map("milestones")
+}
+
+model Invoice {
+  id             Int      @id @default(autoincrement())
+  invoice_number String   @unique @db.VarChar(20)
+  client_id      Int
+  project_id     Int?
+  issue_date     DateTime @db.Date
+  due_date       DateTime @db.Date
+  amount         Decimal  @db.Decimal(15, 2)
+  tax_amount     Decimal  @default(0) @db.Decimal(15, 2)
+  total_amount   Decimal  @db.Decimal(15, 2)
+  currency       String   @default("USD") @db.VarChar(3)
+  status         String   @default("draft") @db.VarChar(20)
+  notes          String?
+  department     String?  @db.VarChar(50)
+  created_by     Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+
+  // Relations
+  client       Client        @relation(fields: [client_id], references: [id])
+  project      Project?      @relation(fields: [project_id], references: [id])
+  creator      User          @relation(fields: [created_by], references: [id])
+  items        InvoiceItem[]
+  payments     Payment[]
+  credit_notes CreditNote[]
+
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          Int     @id @default(autoincrement())
+  invoice_id  Int
+  description String
+  quantity    Decimal @db.Decimal(10, 2)
+  unit_price  Decimal @db.Decimal(15, 2)
+  amount      Decimal @db.Decimal(15, 2)
+  tax_rate    Decimal @default(0) @db.Decimal(5, 2)
+  tax_amount  Decimal @default(0) @db.Decimal(15, 2)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  // Relations
+  invoice Invoice @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+model Payment {
+  id               Int      @id @default(autoincrement())
+  invoice_id       Int
+  amount           Decimal  @db.Decimal(15, 2)
+  payment_date     DateTime @db.Date
+  payment_method   String?  @db.VarChar(50)
+  reference_number String?  @db.VarChar(100)
+  notes            String?
+  created_by       Int
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now()) @updatedAt
+
+  // Relations
+  invoice Invoice @relation(fields: [invoice_id], references: [id])
+  creator User    @relation(fields: [created_by], references: [id])
+
+  @@map("payments")
+}
+
+model CreditNote {
+  id                  Int      @id @default(autoincrement())
+  invoice_id          Int
+  credit_note_number  String   @unique @db.VarChar(20)
+  issue_date          DateTime @db.Date
+  amount              Decimal  @db.Decimal(15, 2)
+  reason              String?
+  status              String   @default("issued") @db.VarChar(20)
+  created_by          Int
+  created_at          DateTime @default(now())
+  updated_at          DateTime @default(now()) @updatedAt
+
+  // Relations
+  invoice Invoice @relation(fields: [invoice_id], references: [id])
+  creator User    @relation(fields: [created_by], references: [id])
+
+  @@map("credit_notes")
+}
+
+// ============================================================================
+// MODULE 2: EXPENSE & PURCHASE MANAGEMENT
+// ============================================================================
+
+model Vendor {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(100)
+  email         String?  @db.VarChar(100)
+  phone         String?  @db.VarChar(20)
+  address       String?
+  tax_id        String?  @db.VarChar(50)
+  payment_terms Int      @default(30)
+  created_by    Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator  User      @relation(fields: [created_by], references: [id])
+  expenses Expense[]
+
+  @@map("vendors")
+}
+
+model ExpenseCategory {
+  id               Int      @id @default(autoincrement())
+  name             String   @db.VarChar(100)
+  description      String?
+  is_tax_deductible Boolean @default(true)
+  created_by       Int
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator  User      @relation(fields: [created_by], references: [id])
+  expenses Expense[]
+
+  @@map("expense_categories")
+}
+
+model Expense {
+  id              Int       @id @default(autoincrement())
+  vendor_id       Int?
+  category_id     Int?
+  project_id      Int?
+  description     String
+  amount          Decimal   @db.Decimal(15, 2)
+  tax_amount      Decimal   @default(0) @db.Decimal(15, 2)
+  currency        String    @default("USD") @db.VarChar(3)
+  expense_date    DateTime  @db.Date
+  payment_method  String?   @db.VarChar(50)
+  receipt_path    String?   @db.VarChar(255)
+  is_recurring    Boolean   @default(false)
+  is_reimbursable Boolean   @default(false)
+  status          String    @default("pending") @db.VarChar(20)
+  created_by      Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @default(now()) @updatedAt
+
+  // Relations
+  vendor             Vendor?           @relation(fields: [vendor_id], references: [id])
+  category           ExpenseCategory?  @relation(fields: [category_id], references: [id])
+  project            Project?          @relation(fields: [project_id], references: [id])
+  creator            User              @relation(fields: [created_by], references: [id])
+  recurring_expenses RecurringExpense[]
+
+  @@map("expenses")
+}
+
+model RecurringExpense {
+  id         Int      @id @default(autoincrement())
+  expense_id Int
+  frequency  String   @db.VarChar(20) // monthly, quarterly, yearly
+  start_date DateTime @db.Date
+  end_date   DateTime? @db.Date
+  next_date  DateTime @db.Date
+  created_by Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  // Relations
+  expense Expense @relation(fields: [expense_id], references: [id])
+  creator User    @relation(fields: [created_by], references: [id])
+
+  @@map("recurring_expenses")
+}
+
+// ============================================================================
+// MODULE 3: EMPLOYEE PAYROLL & HR FINANCE
+// ============================================================================
+
+model Employee {
+  id               Int       @id @default(autoincrement())
+  user_id          Int?      @unique
+  employee_id      String    @unique @db.VarChar(20)
+  department       String?   @db.VarChar(50)
+  designation      String?   @db.VarChar(100)
+  join_date        DateTime  @db.Date
+  termination_date DateTime? @db.Date
+  bank_account     String?   @db.VarChar(50)
+  bank_name        String?   @db.VarChar(100)
+  tax_id           String?   @db.VarChar(50)
+  created_by       Int
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @default(now()) @updatedAt
+
+  // Relations
+  user              User?             @relation("UserEmployee", fields: [user_id], references: [id])
+  creator           User              @relation("EmployeeCreator", fields: [created_by], references: [id])
+  salary_structures SalaryStructure[]
+  attendance        Attendance[]
+  payslips          Payslip[]
+
+  @@map("employees")
+}
+
+model SalaryStructure {
+  id                Int       @id @default(autoincrement())
+  employee_id       Int
+  basic_salary      Decimal   @db.Decimal(15, 2)
+  hra               Decimal   @default(0) @db.Decimal(15, 2)
+  conveyance        Decimal   @default(0) @db.Decimal(15, 2)
+  medical_allowance Decimal   @default(0) @db.Decimal(15, 2)
+  special_allowance Decimal   @default(0) @db.Decimal(15, 2)
+  provident_fund    Decimal   @default(0) @db.Decimal(15, 2)
+  tax_deduction     Decimal   @default(0) @db.Decimal(15, 2)
+  other_deductions  Decimal   @default(0) @db.Decimal(15, 2)
+  effective_from    DateTime  @db.Date
+  effective_to      DateTime? @db.Date
+  created_by        Int
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @default(now()) @updatedAt
+
+  // Relations
+  employee Employee @relation(fields: [employee_id], references: [id])
+  creator  User     @relation(fields: [created_by], references: [id])
+
+  @@map("salary_structures")
+}
+
+model Attendance {
+  id           Int      @id @default(autoincrement())
+  employee_id  Int
+  date         DateTime @db.Date
+  status       String   @db.VarChar(20) // present, absent, half-day, leave
+  hours_worked Decimal? @db.Decimal(5, 2)
+  notes        String?
+  created_by   Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now()) @updatedAt
+
+  // Relations
+  employee Employee @relation(fields: [employee_id], references: [id])
+  creator  User     @relation(fields: [created_by], references: [id])
+
+  @@map("attendance")
+}
+
+model PayrollRun {
+  id           Int       @id @default(autoincrement())
+  month        Int
+  year         Int
+  start_date   DateTime  @db.Date
+  end_date     DateTime  @db.Date
+  status       String    @default("draft") @db.VarChar(20)
+  processed_by Int?
+  processed_at DateTime?
+  notes        String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @default(now()) @updatedAt
+
+  // Relations
+  processor User?     @relation(fields: [processed_by], references: [id])
+  payslips  Payslip[]
+
+  @@map("payroll_runs")
+}
+
+model Payslip {
+  id                Int       @id @default(autoincrement())
+  payroll_run_id    Int
+  employee_id       Int
+  basic_salary      Decimal   @db.Decimal(15, 2)
+  hra               Decimal   @default(0) @db.Decimal(15, 2)
+  conveyance        Decimal   @default(0) @db.Decimal(15, 2)
+  medical_allowance Decimal   @default(0) @db.Decimal(15, 2)
+  special_allowance Decimal   @default(0) @db.Decimal(15, 2)
+  overtime          Decimal   @default(0) @db.Decimal(15, 2)
+  bonus             Decimal   @default(0) @db.Decimal(15, 2)
+  gross_salary      Decimal   @db.Decimal(15, 2)
+  provident_fund    Decimal   @default(0) @db.Decimal(15, 2)
+  tax_deduction     Decimal   @default(0) @db.Decimal(15, 2)
+  other_deductions  Decimal   @default(0) @db.Decimal(15, 2)
+  total_deductions  Decimal   @db.Decimal(15, 2)
+  net_salary        Decimal   @db.Decimal(15, 2)
+  payment_status    String    @default("pending") @db.VarChar(20)
+  payment_date      DateTime? @db.Date
+  notes             String?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @default(now()) @updatedAt
+
+  // Relations
+  payroll_run PayrollRun @relation(fields: [payroll_run_id], references: [id])
+  employee    Employee   @relation(fields: [employee_id], references: [id])
+
+  @@map("payslips")
+}
+
+// ============================================================================
+// MODULE 4: ACCOUNTING & GENERAL LEDGER
+// ============================================================================
+
+model AccountType {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(50)
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  // Relations
+  accounts Account[]
+
+  @@map("account_types")
+}
+
+model Account {
+  id                Int      @id @default(autoincrement())
+  account_number    String   @unique @db.VarChar(20)
+  name              String   @db.VarChar(100)
+  type_id           Int
+  parent_account_id Int?
+  description       String?
+  is_active         Boolean  @default(true)
+  created_by        Int
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  // Relations
+  type           AccountType    @relation(fields: [type_id], references: [id])
+  parent_account Account?       @relation("AccountHierarchy", fields: [parent_account_id], references: [id])
+  sub_accounts   Account[]      @relation("AccountHierarchy")
+  creator        User           @relation(fields: [created_by], references: [id])
+  ledger_entries LedgerEntry[]
+
+  @@map("accounts")
+}
+
+model JournalEntry {
+  id             Int      @id @default(autoincrement())
+  entry_number   String   @unique @db.VarChar(20)
+  date           DateTime @db.Date
+  description    String?
+  reference      String?  @db.VarChar(100)
+  is_posted      Boolean  @default(false)
+  created_by     Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator        User          @relation(fields: [created_by], references: [id])
+  ledger_entries LedgerEntry[]
+
+  @@map("journal_entries")
+}
+
+model LedgerEntry {
+  id                Int     @id @default(autoincrement())
+  journal_entry_id  Int
+  account_id        Int
+  debit             Decimal @default(0) @db.Decimal(15, 2)
+  credit            Decimal @default(0) @db.Decimal(15, 2)
+  description       String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  // Relations
+  journal_entry JournalEntry @relation(fields: [journal_entry_id], references: [id])
+  account       Account      @relation(fields: [account_id], references: [id])
+
+  @@map("ledger_entries")
+}
+
+model TaxRate {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(50)
+  rate       Decimal  @db.Decimal(5, 2)
+  type       String   @db.VarChar(20) // GST, VAT, TDS, etc.
+  is_active  Boolean  @default(true)
+  created_by Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator     User        @relation(fields: [created_by], references: [id])
+  tax_records TaxRecord[]
+
+  @@map("tax_rates")
+}
+
+model TaxRecord {
+  id               Int      @id @default(autoincrement())
+  tax_rate_id      Int
+  transaction_type String   @db.VarChar(20) // invoice, expense, payroll
+  transaction_id   Int
+  amount           Decimal  @db.Decimal(15, 2)
+  tax_amount       Decimal  @db.Decimal(15, 2)
+  date             DateTime @db.Date
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now()) @updatedAt
+
+  // Relations
+  tax_rate TaxRate @relation(fields: [tax_rate_id], references: [id])
+
+  @@map("tax_records")
+}
+
+// ============================================================================
+// MODULE 5: BANKING & PAYMENT INTEGRATION
+// ============================================================================
+
+model BankAccount {
+  id              Int      @id @default(autoincrement())
+  account_name    String   @db.VarChar(100)
+  account_number  String   @db.VarChar(50)
+  bank_name       String   @db.VarChar(100)
+  branch          String?  @db.VarChar(100)
+  ifsc_code       String?  @db.VarChar(20)
+  account_type    String?  @db.VarChar(20)
+  currency        String   @default("USD") @db.VarChar(3)
+  opening_balance Decimal  @default(0) @db.Decimal(15, 2)
+  current_balance Decimal  @default(0) @db.Decimal(15, 2)
+  is_active       Boolean  @default(true)
+  created_by      Int
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator      User              @relation(fields: [created_by], references: [id])
+  transactions BankTransaction[]
+
+  @@map("bank_accounts")
+}
+
+model BankTransaction {
+  id               Int      @id @default(autoincrement())
+  bank_account_id  Int
+  transaction_type String   @db.VarChar(20) // deposit, withdrawal, transfer
+  amount           Decimal  @db.Decimal(15, 2)
+  transaction_date DateTime @db.Date
+  description      String?
+  reference_number String?  @db.VarChar(100)
+  is_reconciled    Boolean  @default(false)
+  created_by       Int
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now()) @updatedAt
+
+  // Relations
+  bank_account BankAccount @relation(fields: [bank_account_id], references: [id])
+  creator      User        @relation(fields: [created_by], references: [id])
+
+  @@map("bank_transactions")
+}
+
+model PaymentGateway {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(50)
+  api_key    String?  @db.VarChar(255)
+  secret_key String?  @db.VarChar(255)
+  is_active  Boolean  @default(true)
+  created_by Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator User                   @relation(fields: [created_by], references: [id])
+  logs    PaymentGatewayLog[]
+
+  @@map("payment_gateways")
+}
+
+model PaymentGatewayLog {
+  id               Int      @id @default(autoincrement())
+  gateway_id       Int
+  transaction_type String   @db.VarChar(20)
+  amount           Decimal  @db.Decimal(15, 2)
+  currency         String   @default("USD") @db.VarChar(3)
+  status           String   @db.VarChar(20)
+  response_code    String?  @db.VarChar(50)
+  response_message String?
+  transaction_id   String?  @db.VarChar(100)
+  created_at       DateTime @default(now())
+
+  // Relations
+  gateway PaymentGateway @relation(fields: [gateway_id], references: [id])
+
+  @@map("payment_gateway_logs")
+}
+
+// ============================================================================
+// MODULE 6: FINANCIAL ANALYTICS & REPORTS
+// ============================================================================
+
+model ReportTemplate {
+  id             Int      @id @default(autoincrement())
+  name           String   @db.VarChar(100)
+  description    String?
+  report_type    String   @db.VarChar(50)
+  query_template String?
+  parameters     Json?
+  created_by     Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator      User          @relation(fields: [created_by], references: [id])
+  saved_reports SavedReport[]
+
+  @@map("report_templates")
+}
+
+model SavedReport {
+  id          Int      @id @default(autoincrement())
+  template_id Int
+  name        String   @db.VarChar(100)
+  parameters  Json?
+  result_data Json?
+  created_by  Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  // Relations
+  template ReportTemplate @relation(fields: [template_id], references: [id])
+  creator  User           @relation(fields: [created_by], references: [id])
+
+  @@map("saved_reports")
+}
+
+model Dashboard {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  description String?
+  layout      Json?
+  is_default  Boolean  @default(false)
+  created_by  Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator User              @relation(fields: [created_by], references: [id])
+  widgets DashboardWidget[]
+
+  @@map("dashboards")
+}
+
+model DashboardWidget {
+  id           Int      @id @default(autoincrement())
+  dashboard_id Int
+  widget_type  String   @db.VarChar(50)
+  title        String   @db.VarChar(100)
+  data_source  String?  @db.VarChar(255)
+  parameters   Json?
+  position     Json?
+  created_by   Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now()) @updatedAt
+
+  // Relations
+  dashboard Dashboard @relation(fields: [dashboard_id], references: [id])
+  creator   User      @relation(fields: [created_by], references: [id])
+
+  @@map("dashboard_widgets")
+}
+
+// ============================================================================
+// MODULE 7: AUTOMATION & INTELLIGENCE LAYER
+// ============================================================================
+
+model AutomationRule {
+  id                 Int      @id @default(autoincrement())
+  name               String   @db.VarChar(100)
+  description        String?
+  trigger_event      String   @db.VarChar(50)
+  trigger_conditions Json?
+  actions            Json?
+  is_active          Boolean  @default(true)
+  created_by         Int
+  created_at         DateTime @default(now())
+  updated_at         DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator User @relation(fields: [created_by], references: [id])
+
+  @@map("automation_rules")
+}
+
+model ScheduledTask {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(100)
+  task_type       String    @db.VarChar(50)
+  frequency       String    @db.VarChar(20)
+  cron_expression String?   @db.VarChar(100)
+  parameters      Json?
+  last_run        DateTime?
+  next_run        DateTime?
+  is_active       Boolean   @default(true)
+  created_by      Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @default(now()) @updatedAt
+
+  // Relations
+  creator User @relation(fields: [created_by], references: [id])
+
+  @@map("scheduled_tasks")
+}
+
+model Notification {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  title          String   @db.VarChar(100)
+  message        String
+  notification_type String? @db.VarChar(50)
+  reference_type String?  @db.VarChar(50)
+  reference_id   Int?
+  is_read        Boolean  @default(false)
+  created_at     DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  user_id     Int?
+  action      String   @db.VarChar(50)
+  entity_type String   @db.VarChar(50)
+  entity_id   Int?
+  old_values  Json?
+  new_values  Json?
+  ip_address  String?  @db.VarChar(50)
+  user_agent  String?
+  created_at  DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [user_id], references: [id])
+
+  @@map("audit_logs")
+}

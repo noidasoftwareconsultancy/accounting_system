@@ -1,0 +1,33 @@
+{
+  "name": "financial-management-system",
+  "version": "1.0.0",
+  "description": "Complete Financial Management System with React frontend and Node.js backend",
+  "scripts": {
+    "start": "node start.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "install-deps": "npm install && cd server && npm install && cd ../client && npm install",
+    "db:migrate": "cd server && npm run db:migrate",
+    "db:seed": "cd server && npm run db:seed",
+    "db:reset": "cd server && npm run db:reset",
+    "setup": "npm run install-deps && npm run db:migrate && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "keywords": [
+    "financial-management",
+    "accounting",
+    "invoicing",
+    "expense-tracking",
+    "payroll",
+    "react",
+    "nodejs",
+    "prisma",
+    "material-ui"
+  ],
+  "author": "Financial Management System",
+  "license": "MIT"
+}
