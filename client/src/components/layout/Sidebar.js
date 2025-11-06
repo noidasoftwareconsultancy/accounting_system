@@ -91,8 +91,7 @@ const menuItems = [
     children: [
       { title: 'Bank Accounts', icon: <AccountBalance />, path: '/banking/accounts' },
       { title: 'Transactions', icon: <Payment />, path: '/banking/transactions' },
-      { title: 'Reconciliation', icon: <Analytics />, path: '/banking/reconciliation' },
-      { title: 'Payment Gateways', icon: <CreditCard />, path: '/payments/gateways' }
+      { title: 'Reconciliation', icon: <Analytics />, path: '/banking/reconciliation' }
     ]
   },
   {

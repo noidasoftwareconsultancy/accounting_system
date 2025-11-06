@@ -30,7 +30,7 @@ import {
   Error as ErrorIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { dashboardService } from '../../services/dashboardService';
+import dashboardService from '../../services/dashboardService';
 
 const NotificationCenter = () => {
   const [expanded, setExpanded] = useState(false);

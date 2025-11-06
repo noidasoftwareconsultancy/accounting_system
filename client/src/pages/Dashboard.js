@@ -49,10 +49,11 @@ import {
   Tooltip as ChartTooltip,
   Legend,
   ArcElement,
-  BarElement
+  BarElement,
+  Filler
 } from 'chart.js';
 import { useNavigate } from 'react-router-dom';
-import { dashboardService } from '../services/dashboardService';
+import dashboardService from '../services/dashboardService';
 import { useApp } from '../contexts/AppContext';
 import WelcomeCard from '../components/dashboard/WelcomeCard';
 import ProgressCard from '../components/dashboard/ProgressCard';
@@ -68,7 +69,8 @@ ChartJS.register(
   ChartTooltip,
   Legend,
   ArcElement,
-  BarElement
+  BarElement,
+  Filler
 );
 
 // Enhanced Metric Card with CRO principles
@@ -743,19 +745,20 @@ const Dashboard = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          <Typography variant="subtitle2" component="span" sx={{ fontWeight: 600 }}>
                             {invoice.invoice_number}
                           </Typography>
                         }
                         secondary={
-                          <Box>
-                            <Typography variant="body2" color="textSecondary">
+                          <span>
+                            <Typography variant="body2" component="span" color="textSecondary">
                               {invoice.client?.name} • ${invoice.total_amount?.toLocaleString()}
                             </Typography>
-                            <Typography variant="caption" color="textSecondary">
+                            <br />
+                            <Typography variant="caption" component="span" color="textSecondary">
                               {new Date(invoice.created_at).toLocaleDateString()}
                             </Typography>
-                          </Box>
+                          </span>
                         }
                       />
                       {invoice.status && (
@@ -846,19 +849,20 @@ const Dashboard = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          <Typography variant="subtitle2" component="span" sx={{ fontWeight: 600 }}>
                             {expense.description}
                           </Typography>
                         }
                         secondary={
-                          <Box>
-                            <Typography variant="body2" color="textSecondary">
+                          <span>
+                            <Typography variant="body2" component="span" color="textSecondary">
                               {expense.category?.name || 'Uncategorized'} • ${expense.amount?.toLocaleString()}
                             </Typography>
-                            <Typography variant="caption" color="textSecondary">
+                            <br />
+                            <Typography variant="caption" component="span" color="textSecondary">
                               {new Date(expense.created_at).toLocaleDateString()}
                             </Typography>
-                          </Box>
+                          </span>
                         }
                       />
                       {expense.status && (

@@ -50,7 +50,7 @@ import {
   Assessment
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { projectService } from '../../services/projectService';
+import projectService from '../../services/projectService';
 import { useApp } from '../../contexts/AppContext';
 
 const ProjectList = () => {

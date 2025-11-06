@@ -52,7 +52,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Line, Doughnut } from 'react-chartjs-2';
-import { projectService } from '../../services/projectService';
+import projectService from '../../services/projectService';
 import { useApp } from '../../contexts/AppContext';
 
 const ProjectDetail = () => {

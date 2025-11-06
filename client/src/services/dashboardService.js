@@ -1,6 +1,6 @@
 import api from './api';
 
-export const dashboardService = {
+const dashboardService = {
   // Get dashboard data
   async getDashboardData() {
     const response = await api.get('/dashboard');
@@ -31,3 +31,5 @@ export const dashboardService = {
     return response.data;
   }
 };
+
+export default dashboardService;

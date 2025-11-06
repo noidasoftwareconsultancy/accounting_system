@@ -36,6 +36,16 @@ router.post('/', invoiceValidation, invoiceController.create);
 router.put('/:id', invoiceValidation, invoiceController.update);
 router.delete('/:id', authMiddleware.restrictTo('admin', 'manager'), invoiceController.delete);
 
+// Additional invoice operations
+router.get('/generate-number', invoiceController.generateInvoiceNumber);
+router.post('/:id/send', invoiceController.sendInvoice);
+router.patch('/:id/mark-paid', invoiceController.markAsPaid);
+router.get('/:id/pdf', invoiceController.getInvoicePDF);
+router.post('/:id/duplicate', invoiceController.duplicateInvoice);
+router.get('/overdue', invoiceController.getOverdueInvoices);
+router.get('/client/:clientId', invoiceController.getInvoicesByClient);
+router.get('/project/:projectId', invoiceController.getInvoicesByProject);
+
 // Payment routes
 router.post('/payments', paymentValidation, invoiceController.recordPayment);
 router.post('/:id/payments', paymentValidation, invoiceController.recordPayment);

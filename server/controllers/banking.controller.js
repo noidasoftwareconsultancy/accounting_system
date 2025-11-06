@@ -58,6 +58,11 @@ const bankingController = {
    */
   async createBankAccount(req, res) {
     try {
+      console.log('Create bank account request:', {
+        user: req.user,
+        body: req.body
+      });
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -83,7 +88,8 @@ const bankingController = {
       console.error('Create bank account error:', error);
       res.status(500).json({
         success: false,
-        message: 'Error creating bank account'
+        message: 'Error creating bank account',
+        error: error.message
       });
     }
   },
@@ -271,6 +277,161 @@ const bankingController = {
       res.status(500).json({
         success: false,
         message: 'Error fetching banking statistics'
+      });
+    }
+  },
+
+  /**
+   * Delete bank account
+   */
+  async deleteBankAccount(req, res) {
+    try {
+      const { id } = req.params;
+      await bankingModel.deleteBankAccount(id);
+
+      res.json({
+        success: true,
+        message: 'Bank account deleted successfully'
+      });
+    } catch (error) {
+      console.error('Delete bank account error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error deleting bank account'
+      });
+    }
+  },
+
+  /**
+   * Get account balance history
+   */
+  async getAccountBalanceHistory(req, res) {
+    try {
+      const { id } = req.params;
+      const days = parseInt(req.query.days) || 30;
+      
+      const history = await bankingModel.getAccountBalanceHistory(id, days);
+      
+      res.json({
+        success: true,
+        data: history
+      });
+    } catch (error) {
+      console.error('Get balance history error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching balance history'
+      });
+    }
+  },
+
+  /**
+   * Get cash flow summary
+   */
+  async getCashFlowSummary(req, res) {
+    try {
+      const { accountId } = req.params;
+      const period = req.query.period || 'month';
+      
+      const summary = await bankingModel.getCashFlowSummary(accountId, period);
+      
+      res.json({
+        success: true,
+        data: summary
+      });
+    } catch (error) {
+      console.error('Get cash flow summary error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching cash flow summary'
+      });
+    }
+  },
+
+  /**
+   * Get unreconciled transactions
+   */
+  async getUnreconciledTransactions(req, res) {
+    try {
+      const accountId = req.query.account_id;
+      const transactions = await bankingModel.getUnreconciledTransactions(accountId);
+      
+      res.json({
+        success: true,
+        data: transactions
+      });
+    } catch (error) {
+      console.error('Get unreconciled transactions error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching unreconciled transactions'
+      });
+    }
+  },
+
+  /**
+   * Bulk reconcile transactions
+   */
+  async bulkReconcileTransactions(req, res) {
+    try {
+      const { transactionIds } = req.body;
+      
+      if (!transactionIds || !Array.isArray(transactionIds)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Transaction IDs array is required'
+        });
+      }
+
+      await bankingModel.bulkReconcileTransactions(transactionIds);
+      
+      res.json({
+        success: true,
+        message: 'Transactions reconciled successfully'
+      });
+    } catch (error) {
+      console.error('Bulk reconcile error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error reconciling transactions'
+      });
+    }
+  },
+
+  /**
+   * Transfer between accounts
+   */
+  async transferBetweenAccounts(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation errors',
+          errors: errors.array()
+        });
+      }
+
+      const { fromAccountId, toAccountId, amount, description } = req.body;
+      
+      const result = await bankingModel.transferBetweenAccounts(
+        fromAccountId, 
+        toAccountId, 
+        amount, 
+        description, 
+        req.user.id
+      );
+      
+      res.json({
+        success: true,
+        message: 'Transfer completed successfully',
+        data: result
+      });
+    } catch (error) {
+      console.error('Transfer error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error processing transfer'
       });
     }
   }

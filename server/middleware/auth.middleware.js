@@ -50,9 +50,15 @@ const authMiddleware = {
    */
   restrictTo(...roles) {
     return (req, res, next) => {
+      console.log('Role check:', {
+        userRole: req.user?.role,
+        requiredRoles: roles,
+        hasAccess: roles.includes(req.user?.role)
+      });
+      
       if (!roles.includes(req.user.role)) {
         return res.status(403).json({ 
-          message: 'You do not have permission to perform this action' 
+          message: `You do not have permission to perform this action. Required roles: ${roles.join(', ')}. Your role: ${req.user.role}` 
         });
       }
       next();

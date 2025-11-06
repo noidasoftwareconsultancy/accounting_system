@@ -42,6 +42,9 @@ router.use(authMiddleware.protect);
 // Routes
 router.get('/', employeeController.getAll);
 router.get('/stats', employeeController.getStats);
+router.get('/analytics/departments', employeeController.getDepartmentAnalytics);
+router.get('/department/:department', employeeController.getByDepartment);
+router.get('/search', employeeController.search);
 router.get('/:id', employeeController.getById);
 router.post('/', authMiddleware.restrictTo('admin', 'hr'), employeeValidation, employeeController.create);
 router.put('/:id', authMiddleware.restrictTo('admin', 'hr'), employeeValidation, employeeController.update);
@@ -49,8 +52,15 @@ router.delete('/:id', authMiddleware.restrictTo('admin'), employeeController.del
 
 // Salary structure routes
 router.post('/salary-structure', authMiddleware.restrictTo('admin', 'hr'), salaryValidation, employeeController.createSalaryStructure);
+router.get('/:id/salary-history', employeeController.getSalaryHistory);
+router.put('/:id/salary-structure', authMiddleware.restrictTo('admin', 'hr'), salaryValidation, employeeController.updateSalaryStructure);
 
 // Attendance routes
 router.post('/attendance', attendanceValidation, employeeController.recordAttendance);
+router.post('/attendance/bulk', employeeController.bulkRecordAttendance);
+router.get('/:id/attendance', employeeController.getAttendance);
+router.get('/:id/attendance-summary', employeeController.getAttendanceSummary);
+
+// These routes are now moved above to avoid conflicts with /:id
 
 module.exports = router;

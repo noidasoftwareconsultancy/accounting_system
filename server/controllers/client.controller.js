@@ -159,6 +159,99 @@ const clientController = {
         message: 'Error fetching client statistics'
       });
     }
+  },
+
+  /**
+   * Get client projects
+   */
+  async getClientProjects(req, res) {
+    try {
+      const { id } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const result = await clientModel.getClientProjects(id, page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get client projects error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching client projects'
+      });
+    }
+  },
+
+  /**
+   * Get client invoices
+   */
+  async getClientInvoices(req, res) {
+    try {
+      const { id } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const result = await clientModel.getClientInvoices(id, page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get client invoices error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching client invoices'
+      });
+    }
+  },
+
+  /**
+   * Get client contracts
+   */
+  async getClientContracts(req, res) {
+    try {
+      const { id } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const result = await clientModel.getClientContracts(id, page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get client contracts error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching client contracts'
+      });
+    }
+  },
+
+  /**
+   * Get client financial summary
+   */
+  async getClientFinancialSummary(req, res) {
+    try {
+      const { id } = req.params;
+      const summary = await clientModel.getClientFinancialSummary(id);
+      
+      res.json({
+        success: true,
+        data: summary
+      });
+    } catch (error) {
+      console.error('Get client financial summary error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching client financial summary'
+      });
+    }
   }
 };
 

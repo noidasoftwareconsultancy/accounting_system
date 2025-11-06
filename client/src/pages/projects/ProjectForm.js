@@ -29,8 +29,8 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { projectService } from '../../services/projectService';
-import { clientService } from '../../services/clientService';
+import projectService from '../../services/projectService';
+import clientService from '../../services/clientService';
 import { useApp } from '../../contexts/AppContext';
 
 const ProjectForm = () => {

@@ -25,6 +25,40 @@ async function main() {
 
   console.log('✅ Admin user created:', adminUser.email);
 
+  // Create accountant user
+  const accountantUser = await prisma.user.upsert({
+    where: { email: 'accountant@example.com' },
+    update: {},
+    create: {
+      username: 'accountant',
+      email: 'accountant@example.com',
+      password: hashedPassword,
+      first_name: 'John',
+      last_name: 'Accountant',
+      role: 'accountant',
+      department: 'Finance'
+    }
+  });
+
+  console.log('✅ Accountant user created:', accountantUser.email);
+
+  // Create regular user
+  const regularUser = await prisma.user.upsert({
+    where: { email: 'user@example.com' },
+    update: {},
+    create: {
+      username: 'user',
+      email: 'user@example.com',
+      password: hashedPassword,
+      first_name: 'Jane',
+      last_name: 'User',
+      role: 'user',
+      department: 'Operations'
+    }
+  });
+
+  console.log('✅ Regular user created:', regularUser.email);
+
   // Create account types
   const accountTypes = [
     { name: 'Asset', description: 'Assets owned by the company' },
@@ -162,6 +196,62 @@ async function main() {
   }
 
   console.log('✅ Tax rates created');
+
+  // Create default report templates
+  const reportTemplates = [
+    {
+      name: 'Monthly Financial Summary',
+      description: 'Overview of monthly revenue, expenses, and net income',
+      report_type: 'financial_summary',
+      parameters: {},
+      created_by: adminUser.id
+    },
+    {
+      name: 'Quarterly Income Statement',
+      description: 'Detailed profit and loss statement for quarterly reporting',
+      report_type: 'income_statement',
+      parameters: {},
+      created_by: adminUser.id
+    },
+    {
+      name: 'Year-End Balance Sheet',
+      description: 'Assets, liabilities, and equity at year end',
+      report_type: 'balance_sheet',
+      parameters: {},
+      created_by: adminUser.id
+    },
+    {
+      name: 'Cash Flow Analysis',
+      description: 'Monthly cash inflows and outflows analysis',
+      report_type: 'cash_flow',
+      parameters: {},
+      created_by: adminUser.id
+    },
+    {
+      name: 'Accounts Receivable Aging',
+      description: 'Outstanding customer invoices with aging analysis',
+      report_type: 'accounts_receivable',
+      parameters: {},
+      created_by: adminUser.id
+    },
+    {
+      name: 'Expense Category Analysis',
+      description: 'Detailed breakdown of expenses by category',
+      report_type: 'expense_analysis',
+      parameters: {},
+      created_by: adminUser.id
+    }
+  ];
+
+  // Check if report templates already exist
+  const existingTemplates = await prisma.reportTemplate.count();
+  if (existingTemplates === 0) {
+    await prisma.reportTemplate.createMany({
+      data: reportTemplates
+    });
+  }
+
+  console.log('✅ Report templates created');
 
   console.log('🎉 Database seeding completed successfully!');
 }

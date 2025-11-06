@@ -260,6 +260,165 @@ class Invoice {
       totalAmount: totalAmount._sum.total_amount || 0
     };
   }
+
+  static async sendInvoice(id) {
+    return prisma.invoice.update({
+      where: { id: parseInt(id) },
+      data: { status: 'sent' },
+      include: {
+        client: true,
+        project: true,
+        items: true,
+        payments: true
+      }
+    });
+  }
+
+  static async markAsPaid(id) {
+    return prisma.invoice.update({
+      where: { id: parseInt(id) },
+      data: { status: 'paid' },
+      include: {
+        client: true,
+        project: true,
+        items: true,
+        payments: true
+      }
+    });
+  }
+
+  static async duplicateInvoice(id, createdBy) {
+    const originalInvoice = await this.getById(id);
+    if (!originalInvoice) {
+      throw new Error('Invoice not found');
+    }
+
+    const newInvoiceNumber = await this.generateInvoiceNumber();
+    
+    return prisma.$transaction(async (tx) => {
+      const newInvoice = await tx.invoice.create({
+        data: {
+          invoice_number: newInvoiceNumber,
+          client_id: originalInvoice.client_id,
+          project_id: originalInvoice.project_id,
+          issue_date: new Date(),
+          due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+          amount: originalInvoice.amount,
+          tax_amount: originalInvoice.tax_amount,
+          total_amount: originalInvoice.total_amount,
+          currency: originalInvoice.currency,
+          status: 'draft',
+          notes: originalInvoice.notes,
+          department: originalInvoice.department,
+          created_by: parseInt(createdBy),
+          items: {
+            create: originalInvoice.items.map(item => ({
+              description: item.description,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              amount: item.amount,
+              tax_rate: item.tax_rate,
+              tax_amount: item.tax_amount
+            }))
+          }
+        },
+        include: {
+          client: true,
+          project: true,
+          items: true
+        }
+      });
+
+      return newInvoice;
+    });
+  }
+
+  static async getOverdueInvoices() {
+    return prisma.invoice.findMany({
+      where: {
+        status: { not: 'paid' },
+        due_date: { lt: new Date() }
+      },
+      include: {
+        client: {
+          select: { id: true, name: true, email: true }
+        },
+        project: {
+          select: { id: true, name: true }
+        },
+        payments: true
+      },
+      orderBy: { due_date: 'asc' }
+    });
+  }
+
+  static async getByClient(clientId, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    
+    const [invoices, total] = await Promise.all([
+      prisma.invoice.findMany({
+        where: { client_id: parseInt(clientId) },
+        include: {
+          client: {
+            select: { id: true, name: true, email: true }
+          },
+          project: {
+            select: { id: true, name: true }
+          },
+          items: true,
+          payments: true
+        },
+        orderBy: { created_at: 'desc' },
+        skip,
+        take: limit
+      }),
+      prisma.invoice.count({ where: { client_id: parseInt(clientId) } })
+    ]);
+
+    return {
+      invoices,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  static async getByProject(projectId, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    
+    const [invoices, total] = await Promise.all([
+      prisma.invoice.findMany({
+        where: { project_id: parseInt(projectId) },
+        include: {
+          client: {
+            select: { id: true, name: true, email: true }
+          },
+          project: {
+            select: { id: true, name: true }
+          },
+          items: true,
+          payments: true
+        },
+        orderBy: { created_at: 'desc' },
+        skip,
+        take: limit
+      }),
+      prisma.invoice.count({ where: { project_id: parseInt(projectId) } })
+    ]);
+
+    return {
+      invoices,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  }
 }
 
 module.exports = Invoice;

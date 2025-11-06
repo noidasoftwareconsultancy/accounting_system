@@ -33,7 +33,7 @@ import {
   Phone
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { clientService } from '../../services/clientService';
+import clientService from '../../services/clientService';
 import { useApp } from '../../contexts/AppContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
@@ -60,12 +60,7 @@ const ClientList = () => {
   const fetchClients = useCallback(async () => {
     try {
       setLoading(true);
-      const params = {
-        page: page + 1,
-        limit: rowsPerPage,
-        search: searchTerm
-      };
-      const response = await clientService.getClients(params);
+      const response = await clientService.getAll(page + 1, rowsPerPage, searchTerm);
       setClients(response.data.clients);
       setTotalCount(response.data.pagination.total);
     } catch (error) {
@@ -82,7 +77,7 @@ const ClientList = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await clientService.getClientStats();
+      const response = await clientService.getStats();
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching client stats:', error);
@@ -106,7 +101,7 @@ const ClientList = () => {
 
   const handleDelete = async () => {
     try {
-      await clientService.deleteClient(selectedClient.id);
+      await clientService.delete(selectedClient.id);
       addNotification({
         type: 'success',
         title: 'Success',

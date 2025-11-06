@@ -53,6 +53,56 @@ const invoiceService = {
   async getInvoiceStats() {
     const response = await api.get('/invoices/stats');
     return response.data;
+  },
+
+  // Generate invoice number
+  async generateInvoiceNumber() {
+    const response = await api.get('/invoices/generate-number');
+    return response.data;
+  },
+
+  // Send invoice
+  async sendInvoice(id) {
+    const response = await api.post(`/invoices/${id}/send`);
+    return response.data;
+  },
+
+  // Mark invoice as paid
+  async markAsPaid(id) {
+    const response = await api.patch(`/invoices/${id}/mark-paid`);
+    return response.data;
+  },
+
+  // Get invoice PDF
+  async getInvoicePDF(id) {
+    const response = await api.get(`/invoices/${id}/pdf`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // Duplicate invoice
+  async duplicateInvoice(id) {
+    const response = await api.post(`/invoices/${id}/duplicate`);
+    return response.data;
+  },
+
+  // Get overdue invoices
+  async getOverdueInvoices() {
+    const response = await api.get('/invoices/overdue');
+    return response.data;
+  },
+
+  // Get invoice by client
+  async getInvoicesByClient(clientId, params = {}) {
+    const response = await api.get(`/invoices/client/${clientId}`, { params });
+    return response.data;
+  },
+
+  // Get invoice by project
+  async getInvoicesByProject(projectId, params = {}) {
+    const response = await api.get(`/invoices/project/${projectId}`, { params });
+    return response.data;
   }
 };
 

@@ -7,9 +7,27 @@ export const accountingService = {
     return response.data;
   },
 
+  // Get chart of accounts
+  async getChartOfAccounts() {
+    const response = await api.get('/accounting/accounts/chart');
+    return response.data;
+  },
+
+  // Search accounts
+  async searchAccounts(query) {
+    const response = await api.get('/accounting/accounts/search', { params: { q: query } });
+    return response.data;
+  },
+
   // Get account by ID
   async getAccount(id) {
     const response = await api.get(`/accounting/accounts/${id}`);
+    return response.data;
+  },
+
+  // Get account balance
+  async getAccountBalance(id) {
+    const response = await api.get(`/accounting/accounts/${id}/balance`);
     return response.data;
   },
 
@@ -25,9 +43,21 @@ export const accountingService = {
     return response.data;
   },
 
+  // Delete account
+  async deleteAccount(id) {
+    const response = await api.delete(`/accounting/accounts/${id}`);
+    return response.data;
+  },
+
   // Get account types
   async getAccountTypes() {
     const response = await api.get('/accounting/accounts/types');
+    return response.data;
+  },
+
+  // Get accounts by type
+  async getAccountsByType(typeId) {
+    const response = await api.get(`/accounting/accounts/type/${typeId}`);
     return response.data;
   },
 
@@ -46,6 +76,12 @@ export const accountingService = {
   // Create journal entry
   async createJournalEntry(entryData) {
     const response = await api.post('/accounting/journal-entries', entryData);
+    return response.data;
+  },
+
+  // Update journal entry
+  async updateJournalEntry(id, entryData) {
+    const response = await api.put(`/accounting/journal-entries/${id}`, entryData);
     return response.data;
   },
 

@@ -26,6 +26,7 @@ import {
   MoreVert,
   Edit,
   Delete,
+  Visibility,
   Search,
   FilterList,
   CreditCard,
@@ -34,7 +35,7 @@ import {
 } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useNavigate } from 'react-router-dom';
-import { expenseService } from '../../services/expenseService';
+import expenseService from '../../services/expenseService';
 import { useApp } from '../../contexts/AppContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
@@ -76,7 +77,11 @@ const ExpenseList = () => {
         start_date: startDate?.toISOString().split('T')[0],
         end_date: endDate?.toISOString().split('T')[0]
       };
-      const response = await expenseService.getExpenses(params);
+      const response = await expenseService.getAll(page + 1, rowsPerPage, {
+        category_id: categoryFilter,
+        start_date: startDate?.toISOString().split('T')[0],
+        end_date: endDate?.toISOString().split('T')[0]
+      });
       setExpenses(response.data.expenses);
       setTotalCount(response.data.pagination.total);
     } catch (error) {
@@ -93,7 +98,7 @@ const ExpenseList = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await expenseService.getExpenseStats();
+      const response = await expenseService.getStats();
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching expense stats:', error);
@@ -126,7 +131,7 @@ const ExpenseList = () => {
 
   const handleDelete = async () => {
     try {
-      await expenseService.deleteExpense(selectedExpense.id);
+      await expenseService.delete(selectedExpense.id);
       addNotification({
         type: 'success',
         title: 'Success',
@@ -327,7 +332,8 @@ const ExpenseList = () => {
               label="Start Date"
               value={startDate}
               onChange={setStartDate}
-              renderInput={(params) => <TextField {...params} fullWidth />}
+              slots={{ textField: TextField }}
+              slotProps={{ textField: { fullWidth: true } }}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={2}>
@@ -335,7 +341,8 @@ const ExpenseList = () => {
               label="End Date"
               value={endDate}
               onChange={setEndDate}
-              renderInput={(params) => <TextField {...params} fullWidth />}
+              slots={{ textField: TextField }}
+              slotProps={{ textField: { fullWidth: true } }}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={1}>
@@ -366,7 +373,12 @@ const ExpenseList = () => {
           </TableHead>
           <TableBody>
             {expenses.map((expense) => (
-              <TableRow key={expense.id} hover>
+              <TableRow 
+                key={expense.id} 
+                hover 
+                sx={{ cursor: 'pointer' }}
+                onClick={() => navigate(`/expenses/${expense.id}`)}
+              >
                 <TableCell>
                   <Typography variant="subtitle2">
                     {expense.description}
@@ -441,6 +453,13 @@ const ExpenseList = () => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
+        <MenuItem onClick={() => {
+          navigate(`/expenses/${selectedExpense?.id}`);
+          handleMenuClose();
+        }}>
+          <Visibility sx={{ mr: 1 }} />
+          View Details
+        </MenuItem>
         <MenuItem onClick={() => {
           navigate(`/expenses/${selectedExpense?.id}/edit`);
           handleMenuClose();

@@ -33,17 +33,32 @@ const paymentGatewayValidation = [
 // Apply authentication to all routes
 router.use(authMiddleware.protect);
 
-// Bank account routes
+// Bank account routes (read access for all authenticated users)
 router.get('/accounts', bankingController.getAllBankAccounts);
 router.get('/accounts/stats', bankingController.getStats);
 router.get('/accounts/:id', bankingController.getBankAccountById);
+router.get('/accounts/:id/balance-history', bankingController.getAccountBalanceHistory);
+router.get('/accounts/:accountId/cash-flow', bankingController.getCashFlowSummary);
+
+// Bank account modification routes (restricted to admin/accountant)
 router.post('/accounts', authMiddleware.restrictTo('admin', 'accountant'), bankAccountValidation, bankingController.createBankAccount);
 router.put('/accounts/:id', authMiddleware.restrictTo('admin', 'accountant'), bankAccountValidation, bankingController.updateBankAccount);
+router.delete('/accounts/:id', authMiddleware.restrictTo('admin', 'accountant'), bankingController.deleteBankAccount);
 
-// Transaction routes
+// Transaction routes (read access for all authenticated users)
 router.get('/transactions', bankingController.getTransactions);
+router.get('/transactions/unreconciled', bankingController.getUnreconciledTransactions);
+
+// Transaction modification routes (restricted to admin/accountant)
 router.post('/transactions', authMiddleware.restrictTo('admin', 'accountant'), transactionValidation, bankingController.createTransaction);
+router.post('/transactions/transfer', authMiddleware.restrictTo('admin', 'accountant'), [
+  body('fromAccountId').isInt().withMessage('Valid from account ID is required'),
+  body('toAccountId').isInt().withMessage('Valid to account ID is required'),
+  body('amount').isFloat({ min: 0.01 }).withMessage('Amount must be greater than 0'),
+  body('description').notEmpty().withMessage('Description is required')
+], bankingController.transferBetweenAccounts);
 router.patch('/transactions/:transactionId/reconcile', authMiddleware.restrictTo('admin', 'accountant'), bankingController.reconcileTransaction);
+router.patch('/transactions/bulk-reconcile', authMiddleware.restrictTo('admin', 'accountant'), bankingController.bulkReconcileTransactions);
 
 // Payment gateway routes
 router.get('/gateways', bankingController.getPaymentGateways);

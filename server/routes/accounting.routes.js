@@ -27,18 +27,29 @@ router.use(authMiddleware.protect);
 
 // Account routes
 router.get('/accounts', accountingController.getAllAccounts);
+router.get('/accounts/chart', accountingController.getChartOfAccounts);
+router.get('/accounts/search', accountingController.searchAccounts);
 router.get('/accounts/types', accountingController.getAccountTypes);
+router.get('/accounts/type/:typeId', accountingController.getAccountsByType);
 router.get('/accounts/:id', accountingController.getAccountById);
+router.get('/accounts/:id/balance', accountingController.getAccountBalance);
 router.post('/accounts', authMiddleware.restrictTo('admin', 'accountant'), accountValidation, accountingController.createAccount);
 router.put('/accounts/:id', authMiddleware.restrictTo('admin', 'accountant'), accountValidation, accountingController.updateAccount);
+router.delete('/accounts/:id', authMiddleware.restrictTo('admin', 'accountant'), accountingController.deleteAccount);
 
 // Journal entry routes
 router.get('/journal-entries', accountingController.getAllJournalEntries);
 router.get('/journal-entries/:id', accountingController.getJournalEntryById);
 router.post('/journal-entries', authMiddleware.restrictTo('admin', 'accountant'), journalEntryValidation, accountingController.createJournalEntry);
+router.put('/journal-entries/:id', authMiddleware.restrictTo('admin', 'accountant'), journalEntryValidation, accountingController.updateJournalEntry);
 router.patch('/journal-entries/:id/post', authMiddleware.restrictTo('admin', 'accountant'), accountingController.postJournalEntry);
 
 // Reports
 router.get('/trial-balance', accountingController.getTrialBalance);
+
+// Integration routes for automatic journal entries
+router.post('/integration/invoice/:invoiceId/journal-entry', authMiddleware.restrictTo('admin', 'accountant'), accountingController.createInvoiceJournalEntry);
+router.post('/integration/expense/:expenseId/journal-entry', authMiddleware.restrictTo('admin', 'accountant'), accountingController.createExpenseJournalEntry);
+router.post('/integration/payroll/:payslipId/journal-entry', authMiddleware.restrictTo('admin', 'accountant'), accountingController.createPayrollJournalEntry);
 
 module.exports = router;

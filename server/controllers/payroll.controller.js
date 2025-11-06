@@ -215,6 +215,83 @@ const payrollController = {
         message: 'Error fetching payroll statistics'
       });
     }
+  },
+
+  /**
+   * Generate payroll data
+   */
+  async generatePayrollData(req, res) {
+    try {
+      const { runId } = req.params;
+      const { employeeIds } = req.query;
+      
+      const payrollData = await payrollModel.generatePayrollData(
+        runId, 
+        employeeIds ? employeeIds.split(',') : null
+      );
+      
+      res.json({
+        success: true,
+        data: payrollData
+      });
+    } catch (error) {
+      console.error('Generate payroll data error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error generating payroll data'
+      });
+    }
+  },
+
+  /**
+   * Get payroll analytics
+   */
+  async getAnalytics(req, res) {
+    try {
+      const { period = 'year' } = req.query;
+      const analytics = await payrollModel.getAnalytics(period);
+      
+      res.json({
+        success: true,
+        data: analytics
+      });
+    } catch (error) {
+      console.error('Get payroll analytics error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching payroll analytics'
+      });
+    }
+  },
+
+  /**
+   * Bulk update payment status
+   */
+  async bulkUpdatePaymentStatus(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation errors',
+          errors: errors.array()
+        });
+      }
+
+      const { payslipIds, status, paymentDate } = req.body;
+      await payrollModel.bulkUpdatePaymentStatus(payslipIds, status, paymentDate);
+
+      res.json({
+        success: true,
+        message: 'Payment status updated successfully'
+      });
+    } catch (error) {
+      console.error('Bulk update payment status error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error updating payment status'
+      });
+    }
   }
 };
 

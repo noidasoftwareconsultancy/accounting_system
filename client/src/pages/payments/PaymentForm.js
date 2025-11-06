@@ -58,15 +58,22 @@ const PaymentForm = () => {
         setLoading(true);
         setError(null);
 
+        // Ensure proper data types
+        const paymentData = {
+          ...values,
+          invoice_id: parseInt(values.invoice_id),
+          amount: parseFloat(values.amount)
+        };
+
         if (isEdit) {
-          await paymentService.updatePayment(id, values);
+          await paymentService.updatePayment(id, paymentData);
           addNotification({
             type: 'success',
             title: 'Success',
             message: 'Payment updated successfully'
           });
         } else {
-          await paymentService.recordPayment(values);
+          await paymentService.recordPayment(paymentData);
           addNotification({
             type: 'success',
             title: 'Success',
@@ -93,8 +100,33 @@ const PaymentForm = () => {
     fetchInvoices();
     if (isEdit) {
       fetchPayment();
+    } else {
+      // Check for invoice parameter in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const invoiceId = urlParams.get('invoice');
+      if (invoiceId) {
+        formik.setFieldValue('invoice_id', parseInt(invoiceId));
+      }
     }
   }, [id, isEdit]);
+
+  useEffect(() => {
+    // Pre-select invoice if specified in URL
+    if (!isEdit && invoices.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const invoiceId = urlParams.get('invoice');
+      if (invoiceId) {
+        const invoice = invoices.find(inv => inv.id === parseInt(invoiceId));
+        if (invoice) {
+          setSelectedInvoice(invoice);
+          const remainingAmount = getInvoiceBalance(invoice);
+          if (remainingAmount > 0) {
+            formik.setFieldValue('amount', remainingAmount.toFixed(2));
+          }
+        }
+      }
+    }
+  }, [invoices, isEdit]);
 
   const fetchInvoices = async () => {
     try {
@@ -210,19 +242,22 @@ const PaymentForm = () => {
                           required
                         />
                       )}
-                      renderOption={(props, option) => (
-                        <li {...props}>
-                          <Box>
-                            <Typography variant="body2" fontWeight="medium">
-                              {option.invoice_number} - {option.client?.name}
-                            </Typography>
-                            <Typography variant="caption" color="textSecondary">
-                              Total: {formatCurrency(option.total_amount)} | 
-                              Balance: {formatCurrency(getInvoiceBalance(option))}
-                            </Typography>
-                          </Box>
-                        </li>
-                      )}
+                      renderOption={(props, option) => {
+                        const { key, ...otherProps } = props;
+                        return (
+                          <li key={key} {...otherProps}>
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {option.invoice_number} - {option.client?.name}
+                              </Typography>
+                              <Typography variant="caption" color="textSecondary">
+                                Total: {formatCurrency(option.total_amount)} | 
+                                Balance: {formatCurrency(getInvoiceBalance(option))}
+                              </Typography>
+                            </Box>
+                          </li>
+                        );
+                      }}
                     />
                   </Grid>
 

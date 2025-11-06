@@ -68,8 +68,12 @@ const expenseController = {
    */
   async create(req, res) {
     try {
+      console.log('Expense creation request body:', req.body);
+      console.log('User:', req.user);
+      
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('Validation errors:', errors.array());
         return res.status(400).json({
           success: false,
           message: 'Validation errors',
@@ -420,6 +424,234 @@ const expenseController = {
       res.status(500).json({
         success: false,
         message: 'Error fetching expense statistics'
+      });
+    }
+  },
+
+  /**
+   * Get expenses by category
+   */
+  async getByCategory(req, res) {
+    try {
+      const { categoryId } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const result = await expenseModel.getByCategory(categoryId, page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get expenses by category error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching expenses by category'
+      });
+    }
+  },
+
+  /**
+   * Get expenses by vendor
+   */
+  async getByVendor(req, res) {
+    try {
+      const { vendorId } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const result = await expenseModel.getByVendor(vendorId, page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get expenses by vendor error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching expenses by vendor'
+      });
+    }
+  },
+
+  /**
+   * Get expenses by project
+   */
+  async getByProject(req, res) {
+    try {
+      const { projectId } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const result = await expenseModel.getByProject(projectId, page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get expenses by project error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching expenses by project'
+      });
+    }
+  },
+
+  /**
+   * Approve expense
+   */
+  async approve(req, res) {
+    try {
+      const { id } = req.params;
+      const expense = await expenseModel.approve(id);
+      
+      res.json({
+        success: true,
+        message: 'Expense approved successfully',
+        data: expense
+      });
+    } catch (error) {
+      console.error('Approve expense error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error approving expense'
+      });
+    }
+  },
+
+  /**
+   * Reject expense
+   */
+  async reject(req, res) {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+      const expense = await expenseModel.reject(id, reason);
+      
+      res.json({
+        success: true,
+        message: 'Expense rejected successfully',
+        data: expense
+      });
+    } catch (error) {
+      console.error('Reject expense error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error rejecting expense'
+      });
+    }
+  },
+
+  /**
+   * Mark expense as paid
+   */
+  async markAsPaid(req, res) {
+    try {
+      const { id } = req.params;
+      const expense = await expenseModel.markAsPaid(id);
+      
+      res.json({
+        success: true,
+        message: 'Expense marked as paid',
+        data: expense
+      });
+    } catch (error) {
+      console.error('Mark expense as paid error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error marking expense as paid'
+      });
+    }
+  },
+
+  /**
+   * Upload receipt
+   */
+  async uploadReceipt(req, res) {
+    try {
+      const { id } = req.params;
+      // Note: File upload handling would need to be implemented
+      // This is a placeholder for the receipt upload functionality
+      
+      res.json({
+        success: true,
+        message: 'Receipt upload not implemented yet'
+      });
+    } catch (error) {
+      console.error('Upload receipt error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error uploading receipt'
+      });
+    }
+  },
+
+  /**
+   * Get recurring expenses
+   */
+  async getRecurringExpenses(req, res) {
+    try {
+      const recurringExpenses = await expenseModel.getRecurringExpenses();
+      
+      res.json({
+        success: true,
+        data: recurringExpenses
+      });
+    } catch (error) {
+      console.error('Get recurring expenses error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching recurring expenses'
+      });
+    }
+  },
+
+  /**
+   * Create recurring expense
+   */
+  async createRecurringExpense(req, res) {
+    try {
+      const recurringData = {
+        ...req.body,
+        created_by: req.user.id
+      };
+
+      const recurringExpense = await expenseModel.createRecurringExpense(recurringData);
+
+      res.status(201).json({
+        success: true,
+        message: 'Recurring expense created successfully',
+        data: recurringExpense
+      });
+    } catch (error) {
+      console.error('Create recurring expense error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error creating recurring expense'
+      });
+    }
+  },
+
+  /**
+   * Get expense analytics
+   */
+  async getAnalytics(req, res) {
+    try {
+      const { period } = req.query;
+      const analytics = await expenseModel.getAnalytics(period);
+      
+      res.json({
+        success: true,
+        data: analytics
+      });
+    } catch (error) {
+      console.error('Get expense analytics error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching expense analytics'
       });
     }
   },

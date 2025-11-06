@@ -9,9 +9,21 @@ const expenseValidation = [
   body('description').notEmpty().withMessage('Description is required'),
   body('amount').isFloat({ min: 0.01 }).withMessage('Amount must be greater than 0'),
   body('expense_date').isISO8601().withMessage('Valid expense date is required'),
-  body('category_id').optional().isInt().withMessage('Valid category ID is required'),
-  body('vendor_id').optional().isInt().withMessage('Valid vendor ID is required'),
-  body('project_id').optional().isInt().withMessage('Valid project ID is required'),
+  body('category_id').custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    if (!Number.isInteger(Number(value))) throw new Error('Valid category ID is required');
+    return true;
+  }),
+  body('vendor_id').custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    if (!Number.isInteger(Number(value))) throw new Error('Valid vendor ID is required');
+    return true;
+  }),
+  body('project_id').custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    if (!Number.isInteger(Number(value))) throw new Error('Valid project ID is required');
+    return true;
+  }),
   body('currency').optional().isLength({ min: 3, max: 3 }).withMessage('Currency must be 3 characters'),
   body('status').optional().isIn(['pending', 'approved', 'rejected', 'paid']).withMessage('Invalid status')
 ];
@@ -37,11 +49,21 @@ router.use(authMiddleware.protect);
 // Expense routes
 router.get('/', expenseController.getAll);
 router.get('/stats', expenseController.getStats);
+router.get('/analytics', expenseController.getAnalytics);
+router.get('/recurring', expenseController.getRecurringExpenses);
 router.get('/summary/by-category', expenseController.getSummaryByCategory);
 router.get('/summary/by-month', expenseController.getSummaryByMonth);
+router.get('/category/:categoryId', expenseController.getByCategory);
+router.get('/vendor/:vendorId', expenseController.getByVendor);
+router.get('/project/:projectId', expenseController.getByProject);
 router.get('/:id', expenseController.getById);
 router.post('/', expenseValidation, expenseController.create);
+router.post('/recurring', expenseController.createRecurringExpense);
+router.post('/:id/receipt', expenseController.uploadReceipt);
 router.put('/:id', expenseValidation, expenseController.update);
+router.patch('/:id/approve', authMiddleware.restrictTo('admin', 'manager'), expenseController.approve);
+router.patch('/:id/reject', authMiddleware.restrictTo('admin', 'manager'), expenseController.reject);
+router.patch('/:id/mark-paid', authMiddleware.restrictTo('admin', 'manager'), expenseController.markAsPaid);
 router.delete('/:id', authMiddleware.restrictTo('admin', 'manager'), expenseController.delete);
 
 // Category routes

@@ -99,6 +99,7 @@ const Payment = {
                     ...paymentData,
                     invoice_id: parseInt(paymentData.invoice_id),
                     amount: parseFloat(paymentData.amount),
+                    payment_date: new Date(paymentData.payment_date + 'T00:00:00.000Z'),
                     created_by: parseInt(paymentData.created_by)
                 },
                 include: {
@@ -148,7 +149,8 @@ const Payment = {
             data: {
                 ...paymentData,
                 amount: paymentData.amount ? parseFloat(paymentData.amount) : undefined,
-                invoice_id: paymentData.invoice_id ? parseInt(paymentData.invoice_id) : undefined
+                invoice_id: paymentData.invoice_id ? parseInt(paymentData.invoice_id) : undefined,
+                payment_date: paymentData.payment_date ? new Date(paymentData.payment_date + 'T00:00:00.000Z') : undefined
             },
             include: {
                 invoice: {

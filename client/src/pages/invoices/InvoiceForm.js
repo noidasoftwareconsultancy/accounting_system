@@ -35,8 +35,8 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useNavigate, useParams } from 'react-router-dom';
 import invoiceService from '../../services/invoiceService';
-import { clientService } from '../../services/clientService';
-import { projectService } from '../../services/projectService';
+import clientService from '../../services/clientService';
+import projectService from '../../services/projectService';
 import { useApp } from '../../contexts/AppContext';
 
 const InvoiceForm = () => {

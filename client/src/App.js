@@ -30,13 +30,15 @@ import ProjectDetail from './pages/projects/ProjectDetail';
 // Expense Pages
 import ExpenseList from './pages/expenses/ExpenseList';
 import ExpenseForm from './pages/expenses/ExpenseForm';
-import ExpenseCategories from './pages/expenses/ExpenseCategories';
+import ExpenseDetail from './pages/expenses/ExpenseDetail';
+import CategoryList from './pages/expenses/CategoryList';
 import VendorList from './pages/expenses/VendorList';
 
 // HR & Payroll Pages
 import EmployeeList from './pages/employees/EmployeeList';
 import EmployeeForm from './pages/employees/EmployeeForm';
 import EmployeeDetail from './pages/employees/EmployeeDetail';
+import Attendance from './pages/Attendance/Attendance';
 import PayrollList from './pages/payroll/PayrollList';
 import PayrollForm from './pages/payroll/PayrollForm';
 import PayrollDetail from './pages/payroll/PayrollDetail';
@@ -60,7 +62,10 @@ import PaymentGatewayForm from './pages/payments/PaymentGatewayForm';
 
 // Report Pages
 import FinancialReports from './pages/reports/FinancialReports';
-import TaxReports from './pages/reports/TaxReports';
+import TaxReports from './pages/tax/TaxReports';
+// import TaxReportsSimple from './pages/tax/TaxReportsSimple';
+import TaxRates from './pages/tax/TaxRates';
+import CustomReports from './pages/reports/CustomReports';
 
 const AppContent = () => {
   const { theme } = useApp();
@@ -159,7 +164,7 @@ const AppContent = () => {
     shape: {
       borderRadius: 2,
     },
-    shadows: [
+    shadows: theme === 'light' ? [
       'none',
       '0 1px 2px 0 rgb(0 0 0 / 0.05)',
       '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
@@ -169,24 +174,48 @@ const AppContent = () => {
       '0 25px 50px -12px rgb(0 0 0 / 0.25)',
       '0 35px 60px -12px rgb(0 0 0 / 0.3)',
       '0 45px 70px -12px rgb(0 0 0 / 0.35)',
-      ...(theme === 'light' 
-        ? [
-            '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-            '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-            '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-            '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-            '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-            '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-          ]
-        : [
-            '0 1px 2px 0 rgb(0 0 0 / 0.3)',
-            '0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4)',
-            '0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4)',
-            '0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4)',
-            '0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4)',
-            '0 25px 50px -12px rgb(0 0 0 / 0.5)',
-          ]
-      )
+      '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+      '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+      '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+      '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+      '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+      '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+      '0 35px 60px -12px rgb(0 0 0 / 0.3)',
+      '0 45px 70px -12px rgb(0 0 0 / 0.35)',
+      '0 50px 80px -12px rgb(0 0 0 / 0.4)',
+      '0 55px 90px -12px rgb(0 0 0 / 0.45)',
+      '0 60px 100px -12px rgb(0 0 0 / 0.5)',
+      '0 65px 110px -12px rgb(0 0 0 / 0.55)',
+      '0 70px 120px -12px rgb(0 0 0 / 0.6)',
+      '0 75px 130px -12px rgb(0 0 0 / 0.65)',
+      '0 80px 140px -12px rgb(0 0 0 / 0.7)',
+      '0 85px 150px -12px rgb(0 0 0 / 0.75)'
+    ] : [
+      'none',
+      '0 1px 2px 0 rgb(0 0 0 / 0.3)',
+      '0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4)',
+      '0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4)',
+      '0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4)',
+      '0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4)',
+      '0 25px 50px -12px rgb(0 0 0 / 0.5)',
+      '0 35px 60px -12px rgb(0 0 0 / 0.55)',
+      '0 45px 70px -12px rgb(0 0 0 / 0.6)',
+      '0 1px 2px 0 rgb(0 0 0 / 0.3)',
+      '0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4)',
+      '0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4)',
+      '0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4)',
+      '0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4)',
+      '0 25px 50px -12px rgb(0 0 0 / 0.5)',
+      '0 35px 60px -12px rgb(0 0 0 / 0.55)',
+      '0 45px 70px -12px rgb(0 0 0 / 0.6)',
+      '0 50px 80px -12px rgb(0 0 0 / 0.65)',
+      '0 55px 90px -12px rgb(0 0 0 / 0.7)',
+      '0 60px 100px -12px rgb(0 0 0 / 0.75)',
+      '0 65px 110px -12px rgb(0 0 0 / 0.8)',
+      '0 70px 120px -12px rgb(0 0 0 / 0.85)',
+      '0 75px 130px -12px rgb(0 0 0 / 0.9)',
+      '0 80px 140px -12px rgb(0 0 0 / 0.95)',
+      '0 85px 150px -12px rgb(0 0 0 / 1.0)'
     ],
     components: {
       MuiButton: {
@@ -297,8 +326,9 @@ const AppContent = () => {
               {/* Expense Routes */}
               <Route path="/expenses" element={<ProtectedRoute><ExpenseList /></ProtectedRoute>} />
               <Route path="/expenses/new" element={<ProtectedRoute><ExpenseForm /></ProtectedRoute>} />
+              <Route path="/expenses/:id" element={<ProtectedRoute><ExpenseDetail /></ProtectedRoute>} />
               <Route path="/expenses/:id/edit" element={<ProtectedRoute><ExpenseForm /></ProtectedRoute>} />
-              <Route path="/expenses/categories" element={<ProtectedRoute><ExpenseCategories /></ProtectedRoute>} />
+              <Route path="/expenses/categories" element={<ProtectedRoute><CategoryList /></ProtectedRoute>} />
               <Route path="/expenses/vendors" element={<ProtectedRoute><VendorList /></ProtectedRoute>} />
 
               {/* Employee Routes */}
@@ -306,6 +336,9 @@ const AppContent = () => {
               <Route path="/employees/new" element={<ProtectedRoute><EmployeeForm /></ProtectedRoute>} />
               <Route path="/employees/:id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
               <Route path="/employees/:id/edit" element={<ProtectedRoute><EmployeeForm /></ProtectedRoute>} />
+              
+              {/* HR Routes */}
+              <Route path="/hr/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
 
               {/* Payroll Routes */}
               <Route path="/payroll" element={<ProtectedRoute><PayrollList /></ProtectedRoute>} />
@@ -333,10 +366,17 @@ const AppContent = () => {
 
               {/* Report Routes */}
               <Route path="/reports/financial" element={<ProtectedRoute><FinancialReports /></ProtectedRoute>} />
-              <Route path="/reports/tax" element={<ProtectedRoute><TaxReports /></ProtectedRoute>} />
+              <Route path="/reports/custom" element={<ProtectedRoute><CustomReports /></ProtectedRoute>} />
+              
+              {/* Legacy redirect for old tax reports path */}
+              <Route path="/reports/tax" element={<Navigate to="/tax/reports" replace />} />
+
+              {/* Tax Routes */}
+              <Route path="/tax/reports" element={<ProtectedRoute><TaxReports /></ProtectedRoute>} />
+              <Route path="/tax/rates" element={<ProtectedRoute><TaxRates /></ProtectedRoute>} />
 
               {/* Catch all route */}
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              {/* <Route path="*" element={<Navigate to="/dashboard" replace />} /> */}
             </Routes>
           </Layout>
         </Router>

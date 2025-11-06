@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { usePermissions } from '../../utils/permissions';
 import { 
   Drawer, 
   List, 
@@ -24,9 +25,20 @@ import {
   AccountBalance as AccountingIcon,
   AccountBalanceWallet as BankingIcon,
   BarChart as AnalyticsIcon,
+  Assessment as TaxIcon,
   AutoAwesome as AutomationIcon,
   Settings as SettingsIcon,
-  Help as HelpIcon
+  Percent as TaxRateIcon,
+  TrendingUp as TrendingUpIcon,
+  Help as HelpIcon,
+  Category as CategoryIcon,
+  Business as BusinessIcon,
+  ExpandLess,
+  ExpandMore,
+  Work as WorkIcon,
+  Payment as PayrollIcon,
+  Schedule as AttendanceIcon,
+  AccountCircle as ProfileIcon
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -83,8 +95,13 @@ const DrawerStyled = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'ope
 const AppSidebar = ({ open }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { canManage } = usePermissions();
+  const [expenseMenuOpen, setExpenseMenuOpen] = React.useState(false);
+  const [hrMenuOpen, setHrMenuOpen] = React.useState(false);
+  const [taxMenuOpen, setTaxMenuOpen] = React.useState(false);
+  const [reportsMenuOpen, setReportsMenuOpen] = React.useState(false);
   
-  const renderNavItem = (to, icon, text) => {
+  const renderNavItem = (to, icon, text, isSubItem = false) => {
     return (
       <ListItem 
         button 
@@ -92,7 +109,7 @@ const AppSidebar = ({ open }) => {
         to={to}
         sx={{
           minHeight: 48,
-          px: 2.5,
+          px: isSubItem ? 4 : 2.5,
           '&:hover': {
             backgroundColor: 'rgba(0, 0, 0, 0.04)'
           }
@@ -146,10 +163,175 @@ const AppSidebar = ({ open }) => {
         
         {renderNavItem("/", <DashboardIcon />, "Dashboard")}
         {renderNavItem("/invoices", <InvoiceIcon />, "Invoices")}
-        {renderNavItem("/expenses", <ExpenseIcon />, "Expenses")}
-        {renderNavItem("/payroll", <EmployeeIcon />, "Payroll & HR")}
+        
+        {/* Expenses with submenu */}
+        <ListItem 
+          button 
+          onClick={() => setExpenseMenuOpen(!expenseMenuOpen)}
+          sx={{
+            minHeight: 48,
+            px: 2.5,
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+            }
+          }}
+        >
+          {!open && isMobile ? (
+            <Tooltip title="Expenses" placement="right">
+              <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+                <ExpenseIcon />
+              </ListItemIcon>
+            </Tooltip>
+          ) : (
+            <>
+              <ListItemIcon><ExpenseIcon /></ListItemIcon>
+              <ListItemText 
+                primary="Expenses" 
+                primaryTypographyProps={{ 
+                  fontSize: isMobile ? '0.875rem' : '1rem',
+                  fontWeight: 'medium'
+                }} 
+              />
+              {expenseMenuOpen ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
+        </ListItem>
+        
+        {/* Expense submenu items */}
+        {expenseMenuOpen && open && (
+          <>
+            {renderNavItem("/expenses", <ExpenseIcon />, "All Expenses", true)}
+            {renderNavItem("/expenses/categories", <CategoryIcon />, "Categories", true)}
+            {renderNavItem("/expenses/vendors", <BusinessIcon />, "Vendors", true)}
+          </>
+        )}
+        
+        {/* HR & Payroll with submenu */}
+        <ListItem 
+          button 
+          onClick={() => setHrMenuOpen(!hrMenuOpen)}
+          sx={{
+            minHeight: 48,
+            px: 2.5,
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+            }
+          }}
+        >
+          {!open && isMobile ? (
+            <Tooltip title="HR & Payroll" placement="right">
+              <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+                <WorkIcon />
+              </ListItemIcon>
+            </Tooltip>
+          ) : (
+            <>
+              <ListItemIcon><WorkIcon /></ListItemIcon>
+              <ListItemText 
+                primary="HR & Payroll" 
+                primaryTypographyProps={{ 
+                  fontSize: isMobile ? '0.875rem' : '1rem',
+                  fontWeight: 'medium'
+                }} 
+              />
+              {hrMenuOpen ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
+        </ListItem>
+        
+        {/* HR & Payroll submenu items */}
+        {hrMenuOpen && open && (
+          <>
+            {renderNavItem("/employees", <EmployeeIcon />, "Employees", true)}
+            {renderNavItem("/payroll", <PayrollIcon />, "Payroll", true)}
+            {renderNavItem("/hr/attendance", <AttendanceIcon />, "Attendance", true)}
+          </>
+        )}
         {renderNavItem("/accounting", <AccountingIcon />, "Accounting")}
         {renderNavItem("/banking", <BankingIcon />, "Banking")}
+        
+        {/* Tax with submenu */}
+        <ListItem 
+          button 
+          onClick={() => setTaxMenuOpen(!taxMenuOpen)}
+          sx={{
+            minHeight: 48,
+            px: 2.5,
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+            }
+          }}
+        >
+          {!open && isMobile ? (
+            <Tooltip title="Tax Management" placement="right">
+              <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+                <TaxIcon />
+              </ListItemIcon>
+            </Tooltip>
+          ) : (
+            <>
+              <ListItemIcon><TaxIcon /></ListItemIcon>
+              <ListItemText 
+                primary="Tax Management" 
+                primaryTypographyProps={{ 
+                  fontSize: isMobile ? '0.875rem' : '1rem',
+                  fontWeight: 'medium'
+                }} 
+              />
+              {taxMenuOpen ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
+        </ListItem>
+        
+        {/* Tax submenu items */}
+        {taxMenuOpen && open && (
+          <>
+            {renderNavItem("/tax/reports", <AnalyticsIcon />, "Tax Reports", true)}
+            {canManage && renderNavItem("/tax/rates", <TaxRateIcon />, "Tax Rates", true)}
+          </>
+        )}
+        
+        {/* Reports with submenu */}
+        <ListItem 
+          button 
+          onClick={() => setReportsMenuOpen(!reportsMenuOpen)}
+          sx={{
+            minHeight: 48,
+            px: 2.5,
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+            }
+          }}
+        >
+          {!open && isMobile ? (
+            <Tooltip title="Reports" placement="right">
+              <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+                <AnalyticsIcon />
+              </ListItemIcon>
+            </Tooltip>
+          ) : (
+            <>
+              <ListItemIcon><AnalyticsIcon /></ListItemIcon>
+              <ListItemText 
+                primary="Reports" 
+                primaryTypographyProps={{ 
+                  fontSize: isMobile ? '0.875rem' : '1rem',
+                  fontWeight: 'medium'
+                }} 
+              />
+              {reportsMenuOpen ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
+        </ListItem>
+        
+        {/* Reports submenu items */}
+        {reportsMenuOpen && open && (
+          <>
+            {renderNavItem("/reports/financial", <TrendingUpIcon />, "Financial Reports", true)}
+            {renderNavItem("/reports/custom", <SettingsIcon />, "Custom Reports", true)}
+          </>
+        )}
+        
         {renderNavItem("/analytics", <AnalyticsIcon />, "Analytics")}
         {renderNavItem("/automation", <AutomationIcon />, "Automation")}
         

@@ -42,5 +42,10 @@ router.post('/runs/:runId/process', authMiddleware.restrictTo('admin', 'hr'), pr
 router.get('/payslips/:id', payrollController.getPayslipById);
 router.get('/employees/:employeeId/payslips', payrollController.getEmployeePayslips);
 router.patch('/payslips/:payslipId/payment-status', authMiddleware.restrictTo('admin', 'hr'), paymentStatusValidation, payrollController.updatePaymentStatus);
+router.patch('/payslips/bulk-payment-status', authMiddleware.restrictTo('admin', 'hr'), payrollController.bulkUpdatePaymentStatus);
+
+// Analytics and generation routes
+router.get('/analytics', payrollController.getAnalytics);
+router.get('/runs/:runId/generate', authMiddleware.restrictTo('admin', 'hr'), payrollController.generatePayrollData);
 
 module.exports = router;

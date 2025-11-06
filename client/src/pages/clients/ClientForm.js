@@ -12,7 +12,7 @@ import { Save, Cancel } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useNavigate, useParams } from 'react-router-dom';
-import { clientService } from '../../services/clientService';
+import clientService from '../../services/clientService';
 import { useApp } from '../../contexts/AppContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
@@ -53,7 +53,7 @@ const ClientForm = () => {
   const fetchClient = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await clientService.getClient(id);
+      const response = await clientService.getById(id);
       setClient(response.data);
     } catch (error) {
       console.error('Error fetching client:', error);
@@ -84,14 +84,14 @@ const ClientForm = () => {
       try {
         setLoading(true);
         if (isEdit) {
-          await clientService.updateClient(id, values);
+          await clientService.update(id, values);
           addNotification({
             type: 'success',
             title: 'Success',
             message: 'Client updated successfully'
           });
         } else {
-          await clientService.createClient(values);
+          await clientService.create(values);
           addNotification({
             type: 'success',
             title: 'Success',

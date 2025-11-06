@@ -239,6 +239,181 @@ const invoiceController = {
     }
   },
 
+  /**
+   * Generate invoice number
+   */
+  async generateInvoiceNumber(req, res) {
+    try {
+      const invoiceNumber = await Invoice.generateInvoiceNumber();
+      
+      res.json({
+        success: true,
+        data: { invoice_number: invoiceNumber }
+      });
+    } catch (error) {
+      console.error('Generate invoice number error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error generating invoice number'
+      });
+    }
+  },
+
+  /**
+   * Send invoice
+   */
+  async sendInvoice(req, res) {
+    try {
+      const { id } = req.params;
+      const invoice = await Invoice.sendInvoice(id);
+      
+      res.json({
+        success: true,
+        message: 'Invoice sent successfully',
+        data: invoice
+      });
+    } catch (error) {
+      console.error('Send invoice error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error sending invoice'
+      });
+    }
+  },
+
+  /**
+   * Mark invoice as paid
+   */
+  async markAsPaid(req, res) {
+    try {
+      const { id } = req.params;
+      const invoice = await Invoice.markAsPaid(id);
+      
+      res.json({
+        success: true,
+        message: 'Invoice marked as paid',
+        data: invoice
+      });
+    } catch (error) {
+      console.error('Mark as paid error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error marking invoice as paid'
+      });
+    }
+  },
+
+  /**
+   * Get invoice PDF
+   */
+  async getInvoicePDF(req, res) {
+    try {
+      const { id } = req.params;
+      // This would integrate with a PDF generation service
+      // For now, return a placeholder response
+      res.json({
+        success: true,
+        message: 'PDF generation not implemented yet'
+      });
+    } catch (error) {
+      console.error('Get invoice PDF error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error generating invoice PDF'
+      });
+    }
+  },
+
+  /**
+   * Duplicate invoice
+   */
+  async duplicateInvoice(req, res) {
+    try {
+      const { id } = req.params;
+      const invoice = await Invoice.duplicateInvoice(id, req.user.id);
+      
+      res.json({
+        success: true,
+        message: 'Invoice duplicated successfully',
+        data: invoice
+      });
+    } catch (error) {
+      console.error('Duplicate invoice error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error duplicating invoice'
+      });
+    }
+  },
+
+  /**
+   * Get overdue invoices
+   */
+  async getOverdueInvoices(req, res) {
+    try {
+      const invoices = await Invoice.getOverdueInvoices();
+      
+      res.json({
+        success: true,
+        data: invoices
+      });
+    } catch (error) {
+      console.error('Get overdue invoices error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching overdue invoices'
+      });
+    }
+  },
+
+  /**
+   * Get invoices by client
+   */
+  async getInvoicesByClient(req, res) {
+    try {
+      const { clientId } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const result = await Invoice.getByClient(clientId, page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get invoices by client error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching client invoices'
+      });
+    }
+  },
+
+  /**
+   * Get invoices by project
+   */
+  async getInvoicesByProject(req, res) {
+    try {
+      const { projectId } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const result = await Invoice.getByProject(projectId, page, limit);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Get invoices by project error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching project invoices'
+      });
+    }
+  },
+
   // Legacy methods for backward compatibility
   getAllInvoices: function(req, res) { return this.getAll(req, res); },
   getInvoiceById: function(req, res) { return this.getById(req, res); },

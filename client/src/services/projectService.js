@@ -1,7 +1,19 @@
 import api from './api';
 
-export const projectService = {
-  // Get all projects
+const projectService = {
+  // Get all projects with pagination
+  async getAll(page = 1, limit = 10, filters = {}) {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      ...Object.fromEntries(Object.entries(filters).filter(([_, v]) => v != null))
+    });
+    
+    const response = await api.get(`/projects?${params}`);
+    return response.data;
+  },
+
+  // Legacy method for backward compatibility
   async getProjects(params = {}) {
     const response = await api.get('/projects', { params });
     return response.data;
@@ -43,3 +55,5 @@ export const projectService = {
     return response.data;
   }
 };
+
+export default projectService;

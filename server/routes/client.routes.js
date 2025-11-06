@@ -24,4 +24,10 @@ router.post('/', clientValidation, clientController.create);
 router.put('/:id', clientValidation, clientController.update);
 router.delete('/:id', authMiddleware.restrictTo('admin', 'manager'), clientController.delete);
 
+// Client relationship routes
+router.get('/:id/projects', clientController.getClientProjects);
+router.get('/:id/invoices', clientController.getClientInvoices);
+router.get('/:id/contracts', clientController.getClientContracts);
+router.get('/:id/financial-summary', clientController.getClientFinancialSummary);
+
 module.exports = router;
