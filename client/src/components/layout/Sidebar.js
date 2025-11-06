@@ -100,7 +100,16 @@ const menuItems = [
     children: [
       { title: 'Financial Reports', icon: <Analytics />, path: '/reports/financial' },
       { title: 'Tax Reports', icon: <Receipt />, path: '/reports/tax' },
-      { title: 'Custom Reports', icon: <Settings />, path: '/reports/custom' }
+      { title: 'Custom Reports', icon: <Settings />, path: '/reports/custom' },
+      { title: 'Report Templates', icon: <Assessment />, path: '/reports/templates' },
+      { title: 'Saved Reports', icon: <Analytics />, path: '/reports/saved' }
+    ]
+  },
+  {
+    title: 'Automation',
+    icon: <Settings />,
+    children: [
+      { title: 'Scheduled Tasks', icon: <Settings />, path: '/automation/scheduled-tasks' }
     ]
   }
 ];

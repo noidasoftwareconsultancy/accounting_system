@@ -66,6 +66,11 @@ import TaxReports from './pages/tax/TaxReports';
 // import TaxReportsSimple from './pages/tax/TaxReportsSimple';
 import TaxRates from './pages/tax/TaxRates';
 import CustomReports from './pages/reports/CustomReports';
+import ReportTemplates from './pages/reports/ReportTemplates';
+import SavedReports from './pages/reports/SavedReports';
+
+// Automation Pages
+import ScheduledTasks from './pages/automation/ScheduledTasks';
 
 const AppContent = () => {
   const { theme } = useApp();
@@ -367,6 +372,11 @@ const AppContent = () => {
               {/* Report Routes */}
               <Route path="/reports/financial" element={<ProtectedRoute><FinancialReports /></ProtectedRoute>} />
               <Route path="/reports/custom" element={<ProtectedRoute><CustomReports /></ProtectedRoute>} />
+              <Route path="/reports/templates" element={<ProtectedRoute><ReportTemplates /></ProtectedRoute>} />
+              <Route path="/reports/saved" element={<ProtectedRoute><SavedReports /></ProtectedRoute>} />
+
+              {/* Automation Routes */}
+              <Route path="/automation/scheduled-tasks" element={<ProtectedRoute><ScheduledTasks /></ProtectedRoute>} />
               
               {/* Legacy redirect for old tax reports path */}
               <Route path="/reports/tax" element={<Navigate to="/tax/reports" replace />} />

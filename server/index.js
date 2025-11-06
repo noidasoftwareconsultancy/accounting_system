@@ -40,6 +40,14 @@ app.use('/api/automation', require('./routes/automation.routes'));
 app.use('/api/dashboard-widgets', require('./routes/dashboard-widget.routes'));
 app.use('/api/audit-logs', require('./routes/audit-log.routes'));
 
+// Advanced Features API Routes
+app.use('/api/account-types', require('./routes/account-type.routes'));
+app.use('/api/ledger-entries', require('./routes/ledger-entry.routes'));
+app.use('/api/tax-records', require('./routes/tax-record.routes'));
+app.use('/api/report-templates', require('./routes/report-template.routes'));
+app.use('/api/saved-reports', require('./routes/saved-report.routes'));
+app.use('/api/scheduled-tasks', require('./routes/scheduled-task.routes'));
+
 // Root route
 app.get('/', (req, res) => {
   res.json({
@@ -69,7 +77,13 @@ app.get('/', (req, res) => {
       notifications: '/api/notifications',
       automation: '/api/automation',
       dashboard_widgets: '/api/dashboard-widgets',
-      audit_logs: '/api/audit-logs'
+      audit_logs: '/api/audit-logs',
+      account_types: '/api/account-types',
+      ledger_entries: '/api/ledger-entries',
+      tax_records: '/api/tax-records',
+      report_templates: '/api/report-templates',
+      saved_reports: '/api/saved-reports',
+      scheduled_tasks: '/api/scheduled-tasks'
     }
   });
 });
