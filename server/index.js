@@ -31,6 +31,15 @@ app.use('/api/hr-reports', require('./routes/hr-reports.routes'));
 app.use('/api/tax', require('./routes/tax.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
 
+// New Enhanced API Routes
+app.use('/api/contracts', require('./routes/contract.routes'));
+app.use('/api/milestones', require('./routes/milestone.routes'));
+app.use('/api/credit-notes', require('./routes/credit-note.routes'));
+app.use('/api/notifications', require('./routes/notification.routes'));
+app.use('/api/automation', require('./routes/automation.routes'));
+app.use('/api/dashboard-widgets', require('./routes/dashboard-widget.routes'));
+app.use('/api/audit-logs', require('./routes/audit-log.routes'));
+
 // Root route
 app.get('/', (req, res) => {
   res.json({
@@ -53,7 +62,14 @@ app.get('/', (req, res) => {
       financial_reports: '/api/financial-reports',
       hr_reports: '/api/hr-reports',
       tax: '/api/tax',
-      dashboard: '/api/dashboard'
+      dashboard: '/api/dashboard',
+      contracts: '/api/contracts',
+      milestones: '/api/milestones',
+      credit_notes: '/api/credit-notes',
+      notifications: '/api/notifications',
+      automation: '/api/automation',
+      dashboard_widgets: '/api/dashboard-widgets',
+      audit_logs: '/api/audit-logs'
     }
   });
 });
