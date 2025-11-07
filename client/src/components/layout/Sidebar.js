@@ -73,7 +73,7 @@ const menuItems = [
     children: [
       { title: 'Employees', icon: <People />, path: '/employees' },
       { title: 'Payroll', icon: <AccountBalanceWallet />, path: '/payroll' },
-      { title: 'Attendance', icon: <Assessment />, path: '/attendance' }
+      { title: 'Attendance', icon: <Assessment />, path: '/hr/attendance' }
     ]
   },
   {

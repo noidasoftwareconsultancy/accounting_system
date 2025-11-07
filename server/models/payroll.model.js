@@ -73,6 +73,28 @@ const payrollModel = {
   },
 
   /**
+   * Update payroll run
+   */
+  async updateRun(id, runData) {
+    return prisma.payrollRun.update({
+      where: { id: parseInt(id) },
+      data: {
+        ...runData,
+        processed_by: runData.processed_by ? parseInt(runData.processed_by) : undefined
+      }
+    });
+  },
+
+  /**
+   * Delete payroll run
+   */
+  async deleteRun(id) {
+    return prisma.payrollRun.delete({
+      where: { id: parseInt(id) }
+    });
+  },
+
+  /**
    * Process payroll for employees
    */
   async processPayroll(runId, employeePayslips, processedBy) {

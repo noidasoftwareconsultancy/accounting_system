@@ -36,6 +36,8 @@ router.get('/runs', payrollController.getAllRuns);
 router.get('/runs/stats', payrollController.getStats);
 router.get('/runs/:id', payrollController.getRunById);
 router.post('/runs', authMiddleware.restrictTo('admin', 'hr'), payrollRunValidation, payrollController.createRun);
+router.put('/runs/:id', authMiddleware.restrictTo('admin', 'hr'), payrollRunValidation, payrollController.updateRun);
+router.delete('/runs/:id', authMiddleware.restrictTo('admin', 'hr'), payrollController.deleteRun);
 router.post('/runs/:runId/process', authMiddleware.restrictTo('admin', 'hr'), processPayrollValidation, payrollController.processPayroll);
 
 // Payslip routes

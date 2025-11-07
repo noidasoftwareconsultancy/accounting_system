@@ -42,6 +42,18 @@ const payrollService = {
     return response.data;
   },
 
+  // Update payroll run
+  async update(id, runData) {
+    const response = await api.put(`/payroll/runs/${id}`, runData);
+    return response.data;
+  },
+
+  // Delete payroll run
+  async delete(id) {
+    const response = await api.delete(`/payroll/runs/${id}`);
+    return response.data;
+  },
+
   // Generate payroll data
   async generatePayrollData(runId, employeeIds = null) {
     const response = await api.get(`/payroll/runs/${runId}/generate`, {

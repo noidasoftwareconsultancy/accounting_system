@@ -92,6 +92,26 @@ const employeeModel = {
 
       // Create user if user_data is provided
       if (employeeData.user_data) {
+        // Check if username already exists
+        const existingUser = await tx.user.findUnique({
+          where: { username: employeeData.user_data.username }
+        });
+
+        if (existingUser) {
+          throw new Error(`Username '${employeeData.user_data.username}' is already taken`);
+        }
+
+        // Check if email already exists
+        if (employeeData.user_data.email) {
+          const existingEmail = await tx.user.findUnique({
+            where: { email: employeeData.user_data.email }
+          });
+
+          if (existingEmail) {
+            throw new Error(`Email '${employeeData.user_data.email}' is already registered`);
+          }
+        }
+
         const user = await tx.user.create({
           data: {
             ...employeeData.user_data,
@@ -189,6 +209,7 @@ const employeeModel = {
       data: {
         ...attendanceData,
         employee_id: parseInt(attendanceData.employee_id),
+        date: attendanceData.date ? new Date(attendanceData.date + 'T00:00:00.000Z') : new Date(),
         created_by: parseInt(attendanceData.created_by),
         hours_worked: attendanceData.hours_worked ? parseFloat(attendanceData.hours_worked) : null
       }

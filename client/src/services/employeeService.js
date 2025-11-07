@@ -136,6 +136,70 @@ const employeeService = {
   async getDepartmentAnalytics() {
     const response = await api.get('/employees/analytics/departments');
     return response.data;
+  },
+
+  // Additional methods to align with server capabilities
+  async bulkUpdateAttendance(attendanceRecords) {
+    const response = await api.post('/employees/attendance/bulk', { attendanceRecords });
+    return response.data;
+  },
+
+  async getEmployeesByDepartment(department) {
+    const response = await api.get(`/employees/department/${department}`);
+    return response.data;
+  },
+
+  async searchEmployees(query) {
+    const response = await api.get('/employees/search', { params: { q: query } });
+    return response.data;
+  },
+
+  // Salary structure methods
+  async getSalaryStructure(employeeId) {
+    const response = await api.get(`/employees/${employeeId}/salary-structure`);
+    return response.data;
+  },
+
+  async createEmployeeSalaryStructure(employeeId, salaryData) {
+    const response = await api.post(`/employees/${employeeId}/salary-structure`, salaryData);
+    return response.data;
+  },
+
+  async updateEmployeeSalaryStructure(employeeId, salaryData) {
+    const response = await api.put(`/employees/${employeeId}/salary-structure`, salaryData);
+    return response.data;
+  },
+
+  // Performance and evaluation methods
+  async getEmployeePerformance(employeeId, year) {
+    const response = await api.get(`/employees/${employeeId}/performance`, { params: { year } });
+    return response.data;
+  },
+
+  async recordPerformanceReview(reviewData) {
+    const response = await api.post('/employees/performance-reviews', reviewData);
+    return response.data;
+  },
+
+  // Leave management methods
+  async getEmployeeLeaves(employeeId, year) {
+    const response = await api.get(`/employees/${employeeId}/leaves`, { params: { year } });
+    return response.data;
+  },
+
+  async applyLeave(leaveData) {
+    const response = await api.post('/employees/leaves', leaveData);
+    return response.data;
+  },
+
+  async approveLeave(leaveId) {
+    const response = await api.patch(`/employees/leaves/${leaveId}/approve`);
+    return response.data;
+  },
+
+  async rejectLeave(leaveId, reason) {
+    const response = await api.patch(`/employees/leaves/${leaveId}/reject`, { reason });
+    return response.data;
   }
 };
 

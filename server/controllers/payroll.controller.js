@@ -89,6 +89,84 @@ const payrollController = {
   },
 
   /**
+   * Update payroll run
+   */
+  async updateRun(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation errors',
+          errors: errors.array()
+        });
+      }
+
+      const { id } = req.params;
+      const runData = req.body;
+
+      const payrollRun = await payrollModel.updateRun(id, runData);
+
+      if (!payrollRun) {
+        return res.status(404).json({
+          success: false,
+          message: 'Payroll run not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Payroll run updated successfully',
+        data: payrollRun
+      });
+    } catch (error) {
+      console.error('Update payroll run error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error updating payroll run'
+      });
+    }
+  },
+
+  /**
+   * Delete payroll run
+   */
+  async deleteRun(req, res) {
+    try {
+      const { id } = req.params;
+      
+      // Check if run has been processed
+      const run = await payrollModel.getRunById(id);
+      if (!run) {
+        return res.status(404).json({
+          success: false,
+          message: 'Payroll run not found'
+        });
+      }
+
+      if (run.status === 'completed') {
+        return res.status(400).json({
+          success: false,
+          message: 'Cannot delete a completed payroll run'
+        });
+      }
+
+      await payrollModel.deleteRun(id);
+
+      res.json({
+        success: true,
+        message: 'Payroll run deleted successfully'
+      });
+    } catch (error) {
+      console.error('Delete payroll run error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error deleting payroll run'
+      });
+    }
+  },
+
+  /**
    * Process payroll
    */
   async processPayroll(req, res) {

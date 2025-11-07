@@ -86,6 +86,22 @@ const employeeController = {
       });
     } catch (error) {
       console.error('Create employee error:', error);
+      
+      // Handle specific error cases
+      if (error.message.includes('already taken') || error.message.includes('already registered')) {
+        return res.status(400).json({
+          success: false,
+          message: error.message
+        });
+      }
+
+      if (error.code === 'P2002') {
+        return res.status(400).json({
+          success: false,
+          message: 'A user with this username or email already exists'
+        });
+      }
+
       res.status(500).json({
         success: false,
         message: 'Error creating employee'
