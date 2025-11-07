@@ -120,6 +120,27 @@ const taxService = {
     return response.data;
   },
 
+  // Tax Report Methods (aligned with server API)
+  async getTaxSummaryReport(params = {}) {
+    const response = await api.get('/tax/reports/summary', { params });
+    return response.data;
+  },
+
+  async getTaxCollectionReport(params = {}) {
+    const response = await api.get('/tax/reports/collection', { params });
+    return response.data;
+  },
+
+  async getTaxLiabilityReport(params = {}) {
+    const response = await api.get('/tax/reports/liability', { params });
+    return response.data;
+  },
+
+  async getTaxComplianceReport(params = {}) {
+    const response = await api.get('/tax/reports/compliance', { params });
+    return response.data;
+  },
+
   // Tax Filing
   async getTaxFilings(params = {}) {
     const response = await api.get('/tax/filings', { params });
@@ -213,6 +234,46 @@ const taxService = {
     const start = new Date(startDate);
     const end = new Date(endDate);
     return start < end;
+  },
+
+  // Export Methods
+  exportToCsv(data, filename) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      throw new Error('No data to export');
+    }
+
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => 
+        headers.map(header => {
+          const value = row[header];
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        }).join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename || 'tax-report'}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  },
+
+  exportToJson(data, filename) {
+    const jsonContent = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename || 'tax-report'}.json`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 };
 
