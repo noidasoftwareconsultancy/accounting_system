@@ -37,7 +37,15 @@ import {
   AccountBalanceWallet,
   Assessment,
   Close,
-  TrendingUp
+  TrendingUp,
+  Description,
+  CreditScore,
+  Flag,
+  Notifications,
+  History,
+  Widgets,
+  SmartToy,
+  Percent
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../../contexts/AppContext';
@@ -53,9 +61,12 @@ const menuItems = [
     icon: <MonetizationOn />,
     children: [
       { title: 'Invoices', icon: <Receipt />, path: '/invoices' },
+      { title: 'Credit Notes', icon: <CreditScore />, path: '/credit-notes', badge: 'New' },
       { title: 'Payments', icon: <Payment />, path: '/payments' },
       { title: 'Clients', icon: <Business />, path: '/clients' },
-      { title: 'Projects', icon: <Work />, path: '/projects' }
+      { title: 'Projects', icon: <Work />, path: '/projects' },
+      { title: 'Contracts', icon: <Description />, path: '/contracts', badge: 'New' },
+      { title: 'Milestones', icon: <Flag />, path: '/milestones', badge: 'New' }
     ]
   },
   {
@@ -73,7 +84,8 @@ const menuItems = [
     children: [
       { title: 'Employees', icon: <People />, path: '/employees' },
       { title: 'Payroll', icon: <AccountBalanceWallet />, path: '/payroll' },
-      { title: 'Attendance', icon: <Assessment />, path: '/hr/attendance' }
+      { title: 'Attendance', icon: <Assessment />, path: '/hr/attendance' },
+      { title: 'HR Reports', icon: <Analytics />, path: '/reports/hr', badge: 'New' }
     ]
   },
   {
@@ -91,7 +103,17 @@ const menuItems = [
     children: [
       { title: 'Bank Accounts', icon: <AccountBalance />, path: '/banking/accounts' },
       { title: 'Transactions', icon: <Payment />, path: '/banking/transactions' },
-      { title: 'Reconciliation', icon: <Analytics />, path: '/banking/reconciliation' }
+      { title: 'Reconciliation', icon: <Analytics />, path: '/banking/reconciliation' },
+      { title: 'Payment Gateways', icon: <Payment />, path: '/payments/gateways' }
+    ]
+  },
+  {
+    title: 'Tax Management',
+    icon: <Percent />,
+    children: [
+      { title: 'Tax Reports', icon: <Analytics />, path: '/tax/reports' },
+      { title: 'Tax Rates', icon: <Percent />, path: '/tax/rates' },
+      { title: 'Tax Records', icon: <Receipt />, path: '/tax/records', badge: 'New' }
     ]
   },
   {
@@ -99,7 +121,6 @@ const menuItems = [
     icon: <Assessment />,
     children: [
       { title: 'Financial Reports', icon: <Analytics />, path: '/reports/financial' },
-      { title: 'Tax Reports', icon: <Receipt />, path: '/reports/tax' },
       { title: 'Custom Reports', icon: <Settings />, path: '/reports/custom' },
       { title: 'Report Templates', icon: <Assessment />, path: '/reports/templates' },
       { title: 'Saved Reports', icon: <Analytics />, path: '/reports/saved' }
@@ -107,9 +128,19 @@ const menuItems = [
   },
   {
     title: 'Automation',
+    icon: <SmartToy />,
+    children: [
+      { title: 'Automation Rules', icon: <SmartToy />, path: '/automation/rules', badge: 'New' },
+      { title: 'Scheduled Tasks', icon: <Settings />, path: '/automation/scheduled-tasks' }
+    ]
+  },
+  {
+    title: 'System',
     icon: <Settings />,
     children: [
-      { title: 'Scheduled Tasks', icon: <Settings />, path: '/automation/scheduled-tasks' }
+      { title: 'Notifications', icon: <Notifications />, path: '/notifications', badge: 'New' },
+      { title: 'Audit Logs', icon: <History />, path: '/system/audit-logs', badge: 'New' },
+      { title: 'Dashboard Widgets', icon: <Widgets />, path: '/dashboard/customize', badge: 'New' }
     ]
   }
 ];

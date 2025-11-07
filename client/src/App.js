@@ -72,6 +72,34 @@ import SavedReports from './pages/reports/SavedReports';
 // Automation Pages
 import ScheduledTasks from './pages/automation/ScheduledTasks';
 
+// Contract Pages
+import ContractList from './pages/contracts/ContractList';
+import ContractForm from './pages/contracts/ContractForm';
+import ContractDetail from './pages/contracts/ContractDetail';
+
+// Credit Note Pages
+import CreditNoteList from './pages/credit-notes/CreditNoteList';
+import CreditNoteForm from './pages/credit-notes/CreditNoteForm';
+import CreditNoteDetail from './pages/credit-notes/CreditNoteDetail';
+
+// Milestone Pages
+import MilestoneList from './pages/milestones/MilestoneList';
+import MilestoneForm from './pages/milestones/MilestoneForm';
+
+// Automation Pages (additional)
+import AutomationRuleList from './pages/automation/AutomationRuleList';
+
+// HR Reports
+import HRReports from './pages/reports/HRReports';
+
+// Tax Records
+import TaxRecordList from './pages/tax/TaxRecordList';
+
+// System Pages
+import AuditLogList from './pages/system/AuditLogList';
+import NotificationCenter from './pages/notifications/NotificationCenter';
+import DashboardCustomize from './pages/dashboard/DashboardCustomize';
+
 const AppContent = () => {
   const { theme } = useApp();
 
@@ -375,8 +403,31 @@ const AppContent = () => {
               <Route path="/reports/templates" element={<ProtectedRoute><ReportTemplates /></ProtectedRoute>} />
               <Route path="/reports/saved" element={<ProtectedRoute><SavedReports /></ProtectedRoute>} />
 
+              {/* Contract Routes */}
+              <Route path="/contracts" element={<ProtectedRoute><ContractList /></ProtectedRoute>} />
+              <Route path="/contracts/new" element={<ProtectedRoute><ContractForm /></ProtectedRoute>} />
+              <Route path="/contracts/:id" element={<ProtectedRoute><ContractDetail /></ProtectedRoute>} />
+              <Route path="/contracts/:id/edit" element={<ProtectedRoute><ContractForm /></ProtectedRoute>} />
+
+              {/* Credit Note Routes */}
+              <Route path="/credit-notes" element={<ProtectedRoute><CreditNoteList /></ProtectedRoute>} />
+              <Route path="/credit-notes/new" element={<ProtectedRoute><CreditNoteForm /></ProtectedRoute>} />
+              <Route path="/credit-notes/:id" element={<ProtectedRoute><CreditNoteDetail /></ProtectedRoute>} />
+              <Route path="/credit-notes/:id/edit" element={<ProtectedRoute><CreditNoteForm /></ProtectedRoute>} />
+
+              {/* Milestone Routes */}
+              <Route path="/milestones" element={<ProtectedRoute><MilestoneList /></ProtectedRoute>} />
+              <Route path="/milestones/new" element={<ProtectedRoute><MilestoneForm /></ProtectedRoute>} />
+              <Route path="/milestones/:id/edit" element={<ProtectedRoute><MilestoneForm /></ProtectedRoute>} />
+
               {/* Automation Routes */}
+              <Route path="/automation/rules" element={<ProtectedRoute><AutomationRuleList /></ProtectedRoute>} />
+              <Route path="/automation/rules/new" element={<ProtectedRoute><AutomationRuleList /></ProtectedRoute>} />
+              <Route path="/automation/rules/:id/edit" element={<ProtectedRoute><AutomationRuleList /></ProtectedRoute>} />
               <Route path="/automation/scheduled-tasks" element={<ProtectedRoute><ScheduledTasks /></ProtectedRoute>} />
+
+              {/* HR Reports Routes */}
+              <Route path="/reports/hr" element={<ProtectedRoute><HRReports /></ProtectedRoute>} />
               
               {/* Legacy redirect for old tax reports path */}
               <Route path="/reports/tax" element={<Navigate to="/tax/reports" replace />} />
@@ -384,6 +435,12 @@ const AppContent = () => {
               {/* Tax Routes */}
               <Route path="/tax/reports" element={<ProtectedRoute><TaxReports /></ProtectedRoute>} />
               <Route path="/tax/rates" element={<ProtectedRoute><TaxRates /></ProtectedRoute>} />
+              <Route path="/tax/records" element={<ProtectedRoute><TaxRecordList /></ProtectedRoute>} />
+
+              {/* System Routes */}
+              <Route path="/system/audit-logs" element={<ProtectedRoute><AuditLogList /></ProtectedRoute>} />
+              <Route path="/notifications" element={<ProtectedRoute><NotificationCenter /></ProtectedRoute>} />
+              <Route path="/dashboard/customize" element={<ProtectedRoute><DashboardCustomize /></ProtectedRoute>} />
 
               {/* Catch all route */}
               {/* <Route path="*" element={<Navigate to="/dashboard" replace />} /> */}

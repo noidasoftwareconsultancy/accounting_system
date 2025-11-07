@@ -30,7 +30,7 @@ const AppHeader = ({ open, toggleDrawer }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-  
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [notificationsAnchorEl, setNotificationsAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -120,7 +120,7 @@ const AppHeader = ({ open, toggleDrawer }) => {
             variant="h6"
             color="inherit"
             noWrap
-            sx={{ 
+            sx={{
               flexGrow: 1,
               fontSize: { xs: '1rem', sm: '1.25rem' },
               display: 'flex',
@@ -129,9 +129,9 @@ const AppHeader = ({ open, toggleDrawer }) => {
           >
             {isMobile ? 'FMS' : 'Financial Management System'}
           </Typography>
-          
+
           <Box sx={{ display: 'flex' }}>
-            <IconButton 
+            <IconButton
               color="inherit"
               size={isMobile ? "small" : "medium"}
               aria-label="show notifications"
@@ -143,16 +143,16 @@ const AppHeader = ({ open, toggleDrawer }) => {
                 <NotificationsIcon fontSize={isMobile ? "small" : "medium"} />
               </Badge>
             </IconButton>
-            
+
             {!isMobile && (
-              <IconButton 
+              <IconButton
                 color="inherit"
                 size={isMobile ? "small" : "medium"}
               >
                 <SettingsIcon fontSize={isMobile ? "small" : "medium"} />
               </IconButton>
             )}
-            
+
             <IconButton
               edge="end"
               aria-label="account of current user"

@@ -58,6 +58,13 @@ model User {
   notifications          Notification[]
   audit_logs             AuditLog[]
   employee_user          Employee? @relation("UserEmployee")
+  warehouses_created     Warehouse[]
+  product_categories_created ProductCategory[]
+  products_created       Product[]
+  stock_movements_created StockMovement[]
+  stock_transfers_created StockTransfer[]
+  purchase_orders_created PurchaseOrder[]
+  stock_adjustments_created StockAdjustment[]
 
   @@map("users")
 }
@@ -259,8 +266,10 @@ model Vendor {
   updated_at    DateTime @default(now()) @updatedAt
 
   // Relations
-  creator  User      @relation(fields: [created_by], references: [id])
-  expenses Expense[]
+  creator           User              @relation(fields: [created_by], references: [id])
+  expenses          Expense[]
+  purchase_orders   PurchaseOrder[]
+  product_suppliers ProductSupplier[]
 
   @@map("vendors")
 }
@@ -715,7 +724,310 @@ model DashboardWidget {
 }
 
 // ============================================================================
-// MODULE 7: AUTOMATION & INTELLIGENCE LAYER
+// MODULE 7: INVENTORY MANAGEMENT SYSTEM
+// ============================================================================
+
+model Warehouse {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  code        String   @unique @db.VarChar(20)
+  address     String?
+  city        String?  @db.VarChar(100)
+  state       String?  @db.VarChar(100)
+  country     String?  @db.VarChar(100)
+  postal_code String?  @db.VarChar(20)
+  phone       String?  @db.VarChar(20)
+  email       String?  @db.VarChar(100)
+  manager_id  Int?
+  is_active   Boolean  @default(true)
+  created_by  Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator           User                @relation(fields: [created_by], references: [id])
+  inventory_items   InventoryItem[]
+  stock_movements   StockMovement[]
+  stock_transfers_from StockTransfer[] @relation("TransferFrom")
+  stock_transfers_to   StockTransfer[] @relation("TransferTo")
+
+  @@map("warehouses")
+}
+
+model ProductCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  description String?
+  parent_id   Int?
+  is_active   Boolean  @default(true)
+  created_by  Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  // Relations
+  parent_category ProductCategory?  @relation("CategoryHierarchy", fields: [parent_id], references: [id])
+  sub_categories  ProductCategory[] @relation("CategoryHierarchy")
+  creator         User              @relation(fields: [created_by], references: [id])
+  products        Product[]
+
+  @@map("product_categories")
+}
+
+model Product {
+  id                Int      @id @default(autoincrement())
+  sku               String   @unique @db.VarChar(50)
+  name              String   @db.VarChar(200)
+  description       String?
+  category_id       Int?
+  unit_of_measure   String   @db.VarChar(20) // pcs, kg, ltr, box, etc.
+  unit_price        Decimal  @db.Decimal(15, 2)
+  cost_price        Decimal  @default(0) @db.Decimal(15, 2)
+  reorder_level     Int      @default(0)
+  reorder_quantity  Int      @default(0)
+  tax_rate          Decimal  @default(0) @db.Decimal(5, 2)
+  barcode           String?  @db.VarChar(100)
+  image_url         String?  @db.VarChar(255)
+  is_active         Boolean  @default(true)
+  is_serialized     Boolean  @default(false)
+  is_batch_tracked  Boolean  @default(false)
+  created_by        Int
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  // Relations
+  category          ProductCategory?  @relation(fields: [category_id], references: [id])
+  creator           User              @relation(fields: [created_by], references: [id])
+  inventory_items   InventoryItem[]
+  purchase_order_items PurchaseOrderItem[]
+  stock_movements   StockMovement[]
+  product_suppliers ProductSupplier[]
+  serial_numbers    SerialNumber[]
+  batch_numbers     BatchNumber[]
+
+  @@map("products")
+}
+
+model InventoryItem {
+  id                Int      @id @default(autoincrement())
+  product_id        Int
+  warehouse_id      Int
+  quantity_on_hand  Int      @default(0)
+  quantity_reserved Int      @default(0)
+  quantity_available Int     @default(0)
+  last_stock_date   DateTime?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  // Relations
+  product   Product   @relation(fields: [product_id], references: [id])
+  warehouse Warehouse @relation(fields: [warehouse_id], references: [id])
+
+  @@unique([product_id, warehouse_id])
+  @@map("inventory_items")
+}
+
+model StockMovement {
+  id                Int      @id @default(autoincrement())
+  product_id        Int
+  warehouse_id      Int
+  movement_type     String   @db.VarChar(50) // purchase, sale, adjustment, transfer, return
+  reference_type    String?  @db.VarChar(50) // purchase_order, invoice, stock_transfer
+  reference_id      Int?
+  quantity          Int
+  unit_cost         Decimal? @db.Decimal(15, 2)
+  notes             String?
+  movement_date     DateTime @db.Date
+  created_by        Int
+  created_at        DateTime @default(now())
+
+  // Relations
+  product   Product   @relation(fields: [product_id], references: [id])
+  warehouse Warehouse @relation(fields: [warehouse_id], references: [id])
+  creator   User      @relation(fields: [created_by], references: [id])
+
+  @@map("stock_movements")
+}
+
+model StockTransfer {
+  id                  Int       @id @default(autoincrement())
+  transfer_number     String    @unique @db.VarChar(20)
+  from_warehouse_id   Int
+  to_warehouse_id     Int
+  transfer_date       DateTime  @db.Date
+  expected_date       DateTime? @db.Date
+  status              String    @default("pending") @db.VarChar(20) // pending, in_transit, completed, cancelled
+  notes               String?
+  created_by          Int
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @default(now()) @updatedAt
+
+  // Relations
+  from_warehouse Warehouse             @relation("TransferFrom", fields: [from_warehouse_id], references: [id])
+  to_warehouse   Warehouse             @relation("TransferTo", fields: [to_warehouse_id], references: [id])
+  creator        User                  @relation(fields: [created_by], references: [id])
+  items          StockTransferItem[]
+
+  @@map("stock_transfers")
+}
+
+model StockTransferItem {
+  id                Int     @id @default(autoincrement())
+  transfer_id       Int
+  product_id        Int
+  quantity          Int
+  quantity_received Int     @default(0)
+  notes             String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  // Relations
+  transfer StockTransfer @relation(fields: [transfer_id], references: [id], onDelete: Cascade)
+
+  @@map("stock_transfer_items")
+}
+
+model PurchaseOrder {
+  id                Int       @id @default(autoincrement())
+  po_number         String    @unique @db.VarChar(20)
+  vendor_id         Int
+  warehouse_id      Int?
+  order_date        DateTime  @db.Date
+  expected_date     DateTime? @db.Date
+  received_date     DateTime? @db.Date
+  status            String    @default("draft") @db.VarChar(20) // draft, sent, confirmed, received, cancelled
+  subtotal          Decimal   @db.Decimal(15, 2)
+  tax_amount        Decimal   @default(0) @db.Decimal(15, 2)
+  shipping_cost     Decimal   @default(0) @db.Decimal(15, 2)
+  total_amount      Decimal   @db.Decimal(15, 2)
+  currency          String    @default("USD") @db.VarChar(3)
+  payment_terms     Int       @default(30)
+  notes             String?
+  created_by        Int
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @default(now()) @updatedAt
+
+  // Relations
+  vendor  Vendor              @relation(fields: [vendor_id], references: [id])
+  creator User                @relation(fields: [created_by], references: [id])
+  items   PurchaseOrderItem[]
+
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id                Int     @id @default(autoincrement())
+  purchase_order_id Int
+  product_id        Int
+  quantity          Int
+  quantity_received Int     @default(0)
+  unit_price        Decimal @db.Decimal(15, 2)
+  tax_rate          Decimal @default(0) @db.Decimal(5, 2)
+  tax_amount        Decimal @default(0) @db.Decimal(15, 2)
+  total_amount      Decimal @db.Decimal(15, 2)
+  notes             String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  // Relations
+  purchase_order PurchaseOrder @relation(fields: [purchase_order_id], references: [id], onDelete: Cascade)
+  product        Product       @relation(fields: [product_id], references: [id])
+
+  @@map("purchase_order_items")
+}
+
+model ProductSupplier {
+  id                Int      @id @default(autoincrement())
+  product_id        Int
+  vendor_id         Int
+  supplier_sku      String?  @db.VarChar(50)
+  unit_price        Decimal  @db.Decimal(15, 2)
+  minimum_order_qty Int      @default(1)
+  lead_time_days    Int      @default(0)
+  is_preferred      Boolean  @default(false)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  // Relations
+  product Product @relation(fields: [product_id], references: [id])
+  vendor  Vendor  @relation(fields: [vendor_id], references: [id])
+
+  @@unique([product_id, vendor_id])
+  @@map("product_suppliers")
+}
+
+model SerialNumber {
+  id          Int       @id @default(autoincrement())
+  product_id  Int
+  serial_no   String    @unique @db.VarChar(100)
+  status      String    @default("available") @db.VarChar(20) // available, sold, defective, returned
+  purchase_date DateTime? @db.Date
+  sale_date   DateTime? @db.Date
+  warranty_expiry DateTime? @db.Date
+  notes       String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now()) @updatedAt
+
+  // Relations
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("serial_numbers")
+}
+
+model BatchNumber {
+  id              Int       @id @default(autoincrement())
+  product_id      Int
+  batch_no        String    @db.VarChar(100)
+  manufacturing_date DateTime? @db.Date
+  expiry_date     DateTime? @db.Date
+  quantity        Int       @default(0)
+  notes           String?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @default(now()) @updatedAt
+
+  // Relations
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@unique([product_id, batch_no])
+  @@map("batch_numbers")
+}
+
+model StockAdjustment {
+  id            Int      @id @default(autoincrement())
+  adjustment_number String @unique @db.VarChar(20)
+  warehouse_id  Int?
+  adjustment_date DateTime @db.Date
+  reason        String   @db.VarChar(100)
+  notes         String?
+  status        String   @default("draft") @db.VarChar(20) // draft, approved, cancelled
+  created_by    Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
+
+  // Relations
+  creator User                   @relation(fields: [created_by], references: [id])
+  items   StockAdjustmentItem[]
+
+  @@map("stock_adjustments")
+}
+
+model StockAdjustmentItem {
+  id                Int     @id @default(autoincrement())
+  adjustment_id     Int
+  product_id        Int
+  quantity_before   Int
+  quantity_after    Int
+  quantity_change   Int
+  notes             String?
+  created_at        DateTime @default(now())
+
+  // Relations
+  adjustment StockAdjustment @relation(fields: [adjustment_id], references: [id], onDelete: Cascade)
+
+  @@map("stock_adjustment_items")
+}
+
+// ============================================================================
+// MODULE 8: AUTOMATION & INTELLIGENCE LAYER
 // ============================================================================
 
 model AutomationRule {

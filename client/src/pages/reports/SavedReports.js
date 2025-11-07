@@ -157,7 +157,7 @@ const SavedReports = () => {
   };
 
   const getRowCount = (report) => {
-    return report.result_data?.rowCount || 0;
+    return report?.result_data?.rowCount || 0;
   };
 
   const renderReportData = (data) => {
