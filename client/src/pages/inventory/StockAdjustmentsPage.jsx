@@ -1,13 +1,20 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const StockAdjustmentsPage = () => {
+  const navigate = useNavigate();
+
   return (
     <Box p={3}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Stock Adjustments</Typography>
-        <Button variant="contained" startIcon={<AddIcon />}>
+        <Button 
+          variant="contained" 
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/inventory/adjustments/new')}
+        >
           New Adjustment
         </Button>
       </Box>

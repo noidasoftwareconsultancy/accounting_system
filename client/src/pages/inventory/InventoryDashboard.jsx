@@ -20,6 +20,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import inventoryService from '../../services/inventoryService';
 import purchaseOrderService from '../../services/purchaseOrderService';
+import { useApp } from '../../contexts/AppContext';
 
 const StatCard = ({ title, value, icon, color, subtitle, onClick }) => (
   <Card 
@@ -64,6 +65,7 @@ const StatCard = ({ title, value, icon, color, subtitle, onClick }) => (
 
 const InventoryDashboard = () => {
   const navigate = useNavigate();
+  const { addNotification } = useApp();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState(null);
@@ -121,7 +123,7 @@ const InventoryDashboard = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate('/inventory/products/new')}
+            onClick={() => navigate('/inventory/products')}
             sx={{ mr: 1 }}
           >
             Add Product
@@ -274,7 +276,7 @@ const InventoryDashboard = () => {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={() => navigate('/inventory/products/new')}
+                onClick={() => navigate('/inventory/products')}
               >
                 Add Product
               </Button>

@@ -5,6 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppProvider, useApp } from './contexts/AppContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import Layout from './components/layout/Layout';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -102,12 +103,22 @@ import NotificationCenter from './pages/notifications/NotificationCenter';
 // Inventory Pages
 import InventoryDashboard from './pages/inventory/InventoryDashboard';
 import ProductsPage from './pages/inventory/ProductsPage';
+import EnhancedProductsPage from './pages/inventory/EnhancedProductsPage';
+import ProductDetailPage from './pages/inventory/ProductDetailPage';
+import ProductFormPage from './pages/inventory/forms/ProductFormPage';
 import WarehousesPage from './pages/inventory/WarehousesPage';
+import WarehouseDetailPage from './pages/inventory/WarehouseDetailPage';
+import WarehouseFormPage from './pages/inventory/forms/WarehouseFormPage';
 import StockLevelsPage from './pages/inventory/StockLevelsPage';
 import PurchaseOrdersPage from './pages/inventory/PurchaseOrdersPage';
+import PurchaseOrderDetailPage from './pages/inventory/PurchaseOrderDetailPage';
+import PurchaseOrderFormPage from './pages/inventory/forms/PurchaseOrderFormPage';
 import StockTransfersPage from './pages/inventory/StockTransfersPage';
+import StockTransferFormPage from './pages/inventory/forms/StockTransferFormPage';
 import StockAdjustmentsPage from './pages/inventory/StockAdjustmentsPage';
+import StockAdjustmentFormPage from './pages/inventory/forms/StockAdjustmentFormPage';
 import InventoryReportsPage from './pages/inventory/InventoryReportsPage';
+import AutomationDashboard from './pages/inventory/AutomationDashboard';
 
 // Dashboard Customization
 import DashboardCustomize from './pages/dashboard/DashboardCustomize';
@@ -451,12 +462,25 @@ const AppContent = () => {
 
               {/* Inventory Routes */}
               <Route path="/inventory/dashboard" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
-              <Route path="/inventory/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
+              <Route path="/inventory/products" element={<ProtectedRoute><EnhancedProductsPage /></ProtectedRoute>} />
+              <Route path="/inventory/products/new" element={<ProtectedRoute><ProductFormPage /></ProtectedRoute>} />
+              <Route path="/inventory/products/:id/edit" element={<ProtectedRoute><ProductFormPage /></ProtectedRoute>} />
+              <Route path="/inventory/products/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
               <Route path="/inventory/warehouses" element={<ProtectedRoute><WarehousesPage /></ProtectedRoute>} />
+              <Route path="/inventory/warehouses/new" element={<ProtectedRoute><WarehouseFormPage /></ProtectedRoute>} />
+              <Route path="/inventory/warehouses/:id/edit" element={<ProtectedRoute><WarehouseFormPage /></ProtectedRoute>} />
+              <Route path="/inventory/warehouses/:id" element={<ProtectedRoute><WarehouseDetailPage /></ProtectedRoute>} />
               <Route path="/inventory/stock" element={<ProtectedRoute><StockLevelsPage /></ProtectedRoute>} />
               <Route path="/inventory/purchase-orders" element={<ProtectedRoute><PurchaseOrdersPage /></ProtectedRoute>} />
+              <Route path="/inventory/purchase-orders/new" element={<ProtectedRoute><PurchaseOrderFormPage /></ProtectedRoute>} />
+              <Route path="/inventory/purchase-orders/:id/edit" element={<ProtectedRoute><PurchaseOrderFormPage /></ProtectedRoute>} />
+              <Route path="/inventory/purchase-orders/:id" element={<ProtectedRoute><PurchaseOrderDetailPage /></ProtectedRoute>} />
               <Route path="/inventory/transfers" element={<ProtectedRoute><StockTransfersPage /></ProtectedRoute>} />
+              <Route path="/inventory/transfers/new" element={<ProtectedRoute><StockTransferFormPage /></ProtectedRoute>} />
+              <Route path="/inventory/transfers/:id/edit" element={<ProtectedRoute><StockTransferFormPage /></ProtectedRoute>} />
               <Route path="/inventory/adjustments" element={<ProtectedRoute><StockAdjustmentsPage /></ProtectedRoute>} />
+              <Route path="/inventory/adjustments/new" element={<ProtectedRoute><StockAdjustmentFormPage /></ProtectedRoute>} />
+              <Route path="/inventory/automation" element={<ProtectedRoute><AutomationDashboard /></ProtectedRoute>} />
               <Route path="/inventory/reports" element={<ProtectedRoute><InventoryReportsPage /></ProtectedRoute>} />
 
               {/* System Routes */}
@@ -479,7 +503,9 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <AppProvider>
-          <AppContent />
+          <NotificationProvider>
+            <AppContent />
+          </NotificationProvider>
         </AppProvider>
       </AuthProvider>
     </ErrorBoundary>
