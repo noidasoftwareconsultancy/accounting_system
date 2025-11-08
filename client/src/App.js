@@ -98,6 +98,18 @@ import TaxRecordList from './pages/tax/TaxRecordList';
 // System Pages
 import AuditLogList from './pages/system/AuditLogList';
 import NotificationCenter from './pages/notifications/NotificationCenter';
+
+// Inventory Pages
+import InventoryDashboard from './pages/inventory/InventoryDashboard';
+import ProductsPage from './pages/inventory/ProductsPage';
+import WarehousesPage from './pages/inventory/WarehousesPage';
+import StockLevelsPage from './pages/inventory/StockLevelsPage';
+import PurchaseOrdersPage from './pages/inventory/PurchaseOrdersPage';
+import StockTransfersPage from './pages/inventory/StockTransfersPage';
+import StockAdjustmentsPage from './pages/inventory/StockAdjustmentsPage';
+import InventoryReportsPage from './pages/inventory/InventoryReportsPage';
+
+// Dashboard Customization
 import DashboardCustomize from './pages/dashboard/DashboardCustomize';
 
 const AppContent = () => {
@@ -273,7 +285,7 @@ const AppContent = () => {
         styleOverrides: {
           root: {
             borderRadius: 2,
-            boxShadow: theme === 'light' 
+            boxShadow: theme === 'light'
               ? '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)'
               : '0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4)',
             border: theme === 'light' ? '1px solid #f1f5f9' : '1px solid #334155',
@@ -369,7 +381,7 @@ const AppContent = () => {
               <Route path="/employees/new" element={<ProtectedRoute><EmployeeForm /></ProtectedRoute>} />
               <Route path="/employees/:id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
               <Route path="/employees/:id/edit" element={<ProtectedRoute><EmployeeForm /></ProtectedRoute>} />
-              
+
               {/* HR Routes */}
               <Route path="/hr/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
 
@@ -428,7 +440,7 @@ const AppContent = () => {
 
               {/* HR Reports Routes */}
               <Route path="/reports/hr" element={<ProtectedRoute><HRReports /></ProtectedRoute>} />
-              
+
               {/* Legacy redirect for old tax reports path */}
               <Route path="/reports/tax" element={<Navigate to="/tax/reports" replace />} />
 
@@ -436,6 +448,16 @@ const AppContent = () => {
               <Route path="/tax/reports" element={<ProtectedRoute><TaxReports /></ProtectedRoute>} />
               <Route path="/tax/rates" element={<ProtectedRoute><TaxRates /></ProtectedRoute>} />
               <Route path="/tax/records" element={<ProtectedRoute><TaxRecordList /></ProtectedRoute>} />
+
+              {/* Inventory Routes */}
+              <Route path="/inventory/dashboard" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
+              <Route path="/inventory/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
+              <Route path="/inventory/warehouses" element={<ProtectedRoute><WarehousesPage /></ProtectedRoute>} />
+              <Route path="/inventory/stock" element={<ProtectedRoute><StockLevelsPage /></ProtectedRoute>} />
+              <Route path="/inventory/purchase-orders" element={<ProtectedRoute><PurchaseOrdersPage /></ProtectedRoute>} />
+              <Route path="/inventory/transfers" element={<ProtectedRoute><StockTransfersPage /></ProtectedRoute>} />
+              <Route path="/inventory/adjustments" element={<ProtectedRoute><StockAdjustmentsPage /></ProtectedRoute>} />
+              <Route path="/inventory/reports" element={<ProtectedRoute><InventoryReportsPage /></ProtectedRoute>} />
 
               {/* System Routes */}
               <Route path="/system/audit-logs" element={<ProtectedRoute><AuditLogList /></ProtectedRoute>} />

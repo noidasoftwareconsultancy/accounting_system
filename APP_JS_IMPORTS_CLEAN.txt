@@ -1,0 +1,16 @@
+// System Pages
+import AuditLogList from './pages/system/AuditLogList';
+import NotificationCenter from './pages/notifications/NotificationCenter';
+
+// Inventory Pages
+import InventoryDashboard from './pages/inventory/InventoryDashboard';
+import ProductsPage from './pages/inventory/ProductsPage';
+import WarehousesPage from './pages/inventory/WarehousesPage';
+import StockLevelsPage from './pages/inventory/StockLevelsPage';
+import PurchaseOrdersPage from './pages/inventory/PurchaseOrdersPage';
+import StockTransfersPage from './pages/inventory/StockTransfersPage';
+import StockAdjustmentsPage from './pages/inventory/StockAdjustmentsPage';
+import InventoryReportsPage from './pages/inventory/InventoryReportsPage';
+
+// Dashboard Customization
+import DashboardCustomize from './pages/dashboard/DashboardCustomize';

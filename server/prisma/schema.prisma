@@ -196,6 +196,7 @@ model Invoice {
 model InvoiceItem {
   id          Int     @id @default(autoincrement())
   invoice_id  Int
+  product_id  Int?
   description String
   quantity    Decimal @db.Decimal(10, 2)
   unit_price  Decimal @db.Decimal(15, 2)
@@ -206,7 +207,8 @@ model InvoiceItem {
   updated_at  DateTime @default(now()) @updatedAt
 
   // Relations
-  invoice Invoice @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+  invoice Invoice  @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [product_id], references: [id])
 
   @@map("invoice_items")
 }
@@ -803,6 +805,7 @@ model Product {
   product_suppliers ProductSupplier[]
   serial_numbers    SerialNumber[]
   batch_numbers     BatchNumber[]
+  invoice_items     InvoiceItem[]
 
   @@map("products")
 }

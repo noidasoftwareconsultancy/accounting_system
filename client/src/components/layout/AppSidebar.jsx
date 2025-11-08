@@ -38,7 +38,13 @@ import {
   Work as WorkIcon,
   Payment as PayrollIcon,
   Schedule as AttendanceIcon,
-  AccountCircle as ProfileIcon
+  AccountCircle as ProfileIcon,
+  Inventory as InventoryIcon,
+  Warehouse as WarehouseIcon,
+  ShoppingCart as PurchaseIcon,
+  SwapHoriz as TransferIcon,
+  Tune as AdjustmentIcon,
+  LocalShipping as ProductIcon
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -100,6 +106,7 @@ const AppSidebar = ({ open }) => {
   const [hrMenuOpen, setHrMenuOpen] = React.useState(false);
   const [taxMenuOpen, setTaxMenuOpen] = React.useState(false);
   const [reportsMenuOpen, setReportsMenuOpen] = React.useState(false);
+  const [inventoryMenuOpen, setInventoryMenuOpen] = React.useState(false);
   
   const renderNavItem = (to, icon, text, isSubItem = false) => {
     return (
@@ -249,6 +256,53 @@ const AppSidebar = ({ open }) => {
         )}
         {renderNavItem("/accounting", <AccountingIcon />, "Accounting")}
         {renderNavItem("/banking", <BankingIcon />, "Banking")}
+        
+        {/* Inventory Management with submenu */}
+        <ListItem 
+          button 
+          onClick={() => setInventoryMenuOpen(!inventoryMenuOpen)}
+          sx={{
+            minHeight: 48,
+            px: 2.5,
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+            }
+          }}
+        >
+          {!open && isMobile ? (
+            <Tooltip title="Inventory" placement="right">
+              <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+                <InventoryIcon />
+              </ListItemIcon>
+            </Tooltip>
+          ) : (
+            <>
+              <ListItemIcon><InventoryIcon /></ListItemIcon>
+              <ListItemText 
+                primary="Inventory" 
+                primaryTypographyProps={{ 
+                  fontSize: isMobile ? '0.875rem' : '1rem',
+                  fontWeight: 'medium'
+                }} 
+              />
+              {inventoryMenuOpen ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
+        </ListItem>
+        
+        {/* Inventory submenu items */}
+        {inventoryMenuOpen && open && (
+          <>
+            {renderNavItem("/inventory/dashboard", <DashboardIcon />, "Overview", true)}
+            {renderNavItem("/inventory/products", <ProductIcon />, "Products", true)}
+            {renderNavItem("/inventory/warehouses", <WarehouseIcon />, "Warehouses", true)}
+            {renderNavItem("/inventory/stock", <InventoryIcon />, "Stock Levels", true)}
+            {renderNavItem("/inventory/purchase-orders", <PurchaseIcon />, "Purchase Orders", true)}
+            {renderNavItem("/inventory/transfers", <TransferIcon />, "Stock Transfers", true)}
+            {renderNavItem("/inventory/adjustments", <AdjustmentIcon />, "Adjustments", true)}
+            {renderNavItem("/inventory/reports", <AnalyticsIcon />, "Reports", true)}
+          </>
+        )}
         
         {/* Tax with submenu */}
         <ListItem 

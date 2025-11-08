@@ -50,6 +50,13 @@ router.get('/project/:projectId', invoiceController.getInvoicesByProject);
 router.post('/payments', paymentValidation, invoiceController.recordPayment);
 router.post('/:id/payments', paymentValidation, invoiceController.recordPayment);
 
+// Inventory integration routes
+router.get('/:id/inventory-availability', invoiceController.checkInventoryAvailability);
+router.get('/:id/inventory-status', invoiceController.getWithInventoryStatus);
+router.post('/:id/reserve-inventory', invoiceController.reserveInventory);
+router.post('/:id/release-inventory', invoiceController.releaseReservedInventory);
+router.post('/:id/mark-paid-with-inventory', invoiceController.markAsPaidWithInventory);
+
 // Legacy routes for backward compatibility
 router.get('/invoices', invoiceController.getAllInvoices);
 router.get('/invoices/:id', invoiceController.getInvoiceById);

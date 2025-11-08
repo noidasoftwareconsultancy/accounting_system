@@ -48,6 +48,15 @@ app.use('/api/report-templates', require('./routes/report-template.routes'));
 app.use('/api/saved-reports', require('./routes/saved-report.routes'));
 app.use('/api/scheduled-tasks', require('./routes/scheduled-task.routes'));
 
+// Inventory Management API Routes
+app.use('/api/products', require('./routes/product.routes'));
+app.use('/api/warehouses', require('./routes/warehouse.routes'));
+app.use('/api/inventory', require('./routes/inventory.routes'));
+app.use('/api/purchase-orders', require('./routes/purchase-order.routes'));
+app.use('/api/stock-transfers', require('./routes/stock-transfer.routes'));
+app.use('/api/stock-adjustments', require('./routes/stock-adjustment.routes'));
+app.use('/api/inventory-reports', require('./routes/inventory-reports.routes'));
+
 // Root route
 app.get('/', (req, res) => {
   res.json({
@@ -83,7 +92,14 @@ app.get('/', (req, res) => {
       tax_records: '/api/tax-records',
       report_templates: '/api/report-templates',
       saved_reports: '/api/saved-reports',
-      scheduled_tasks: '/api/scheduled-tasks'
+      scheduled_tasks: '/api/scheduled-tasks',
+      products: '/api/products',
+      warehouses: '/api/warehouses',
+      inventory: '/api/inventory',
+      purchase_orders: '/api/purchase-orders',
+      stock_transfers: '/api/stock-transfers',
+      stock_adjustments: '/api/stock-adjustments',
+      inventory_reports: '/api/inventory-reports'
     }
   });
 });

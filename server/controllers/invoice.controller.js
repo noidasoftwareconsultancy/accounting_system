@@ -414,6 +414,164 @@ const invoiceController = {
     }
   },
 
+  /**
+   * Check inventory availability for invoice
+   */
+  async checkInventoryAvailability(req, res) {
+    try {
+      const { id } = req.params;
+      const { warehouse_id } = req.query;
+
+      if (!warehouse_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Warehouse ID is required'
+        });
+      }
+
+      const invoiceInventoryModel = require('../models/invoice-inventory.model');
+      const availability = await invoiceInventoryModel.checkInventoryAvailability(id, warehouse_id);
+
+      res.json({
+        success: true,
+        data: availability
+      });
+    } catch (error) {
+      console.error('Check inventory availability error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error checking inventory availability'
+      });
+    }
+  },
+
+  /**
+   * Reserve inventory for invoice
+   */
+  async reserveInventory(req, res) {
+    try {
+      const { id } = req.params;
+      const { warehouse_id } = req.body;
+
+      if (!warehouse_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Warehouse ID is required'
+        });
+      }
+
+      const invoiceInventoryModel = require('../models/invoice-inventory.model');
+      const invoice = await invoiceInventoryModel.reserveInventoryForInvoice(id, warehouse_id);
+
+      res.json({
+        success: true,
+        message: 'Inventory reserved successfully',
+        data: invoice
+      });
+    } catch (error) {
+      console.error('Reserve inventory error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error reserving inventory'
+      });
+    }
+  },
+
+  /**
+   * Release reserved inventory for invoice
+   */
+  async releaseReservedInventory(req, res) {
+    try {
+      const { id } = req.params;
+      const { warehouse_id } = req.body;
+
+      if (!warehouse_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Warehouse ID is required'
+        });
+      }
+
+      const invoiceInventoryModel = require('../models/invoice-inventory.model');
+      const invoice = await invoiceInventoryModel.releaseReservedInventoryForInvoice(id, warehouse_id);
+
+      res.json({
+        success: true,
+        message: 'Reserved inventory released successfully',
+        data: invoice
+      });
+    } catch (error) {
+      console.error('Release reserved inventory error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error releasing reserved inventory'
+      });
+    }
+  },
+
+  /**
+   * Mark invoice as paid and deduct inventory
+   */
+  async markAsPaidWithInventory(req, res) {
+    try {
+      const { id } = req.params;
+      const { warehouse_id } = req.body;
+
+      if (!warehouse_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Warehouse ID is required'
+        });
+      }
+
+      const invoiceInventoryModel = require('../models/invoice-inventory.model');
+      const invoice = await invoiceInventoryModel.processInvoicePayment(id, warehouse_id, req.user.id);
+
+      res.json({
+        success: true,
+        message: 'Invoice marked as paid and inventory updated',
+        data: invoice
+      });
+    } catch (error) {
+      console.error('Mark as paid with inventory error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error processing invoice payment'
+      });
+    }
+  },
+
+  /**
+   * Get invoice with inventory status
+   */
+  async getWithInventoryStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { warehouse_id } = req.query;
+
+      if (!warehouse_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Warehouse ID is required'
+        });
+      }
+
+      const invoiceInventoryModel = require('../models/invoice-inventory.model');
+      const invoice = await invoiceInventoryModel.getInvoiceWithInventoryStatus(id, warehouse_id);
+
+      res.json({
+        success: true,
+        data: invoice
+      });
+    } catch (error) {
+      console.error('Get invoice with inventory status error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error fetching invoice with inventory status'
+      });
+    }
+  },
+
   // Legacy methods for backward compatibility
   getAllInvoices: function(req, res) { return this.getAll(req, res); },
   getInvoiceById: function(req, res) { return this.getById(req, res); },

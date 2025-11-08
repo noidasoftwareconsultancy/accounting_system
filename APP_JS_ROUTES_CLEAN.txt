@@ -1,0 +1,9 @@
+              {/* Inventory Routes */}
+              <Route path="/inventory/dashboard" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
+              <Route path="/inventory/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
+              <Route path="/inventory/warehouses" element={<ProtectedRoute><WarehousesPage /></ProtectedRoute>} />
+              <Route path="/inventory/stock" element={<ProtectedRoute><StockLevelsPage /></ProtectedRoute>} />
+              <Route path="/inventory/purchase-orders" element={<ProtectedRoute><PurchaseOrdersPage /></ProtectedRoute>} />
+              <Route path="/inventory/transfers" element={<ProtectedRoute><StockTransfersPage /></ProtectedRoute>} />
+              <Route path="/inventory/adjustments" element={<ProtectedRoute><StockAdjustmentsPage /></ProtectedRoute>} />
+              <Route path="/inventory/reports" element={<ProtectedRoute><InventoryReportsPage /></ProtectedRoute>} />

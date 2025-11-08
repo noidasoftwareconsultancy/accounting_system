@@ -108,6 +108,20 @@ const menuItems = [
     ]
   },
   {
+    title: 'Inventory',
+    icon: <Work />,
+    children: [
+      { title: 'Overview', icon: <Dashboard />, path: '/inventory/dashboard', badge: 'New' },
+      { title: 'Products', icon: <Business />, path: '/inventory/products', badge: 'New' },
+      { title: 'Warehouses', icon: <AccountBalance />, path: '/inventory/warehouses', badge: 'New' },
+      { title: 'Stock Levels', icon: <Assessment />, path: '/inventory/stock', badge: 'New' },
+      { title: 'Purchase Orders', icon: <Receipt />, path: '/inventory/purchase-orders', badge: 'New' },
+      { title: 'Stock Transfers', icon: <TrendingUp />, path: '/inventory/transfers', badge: 'New' },
+      { title: 'Adjustments', icon: <Settings />, path: '/inventory/adjustments', badge: 'New' },
+      { title: 'Reports', icon: <Analytics />, path: '/inventory/reports', badge: 'New' }
+    ]
+  },
+  {
     title: 'Tax Management',
     icon: <Percent />,
     children: [
